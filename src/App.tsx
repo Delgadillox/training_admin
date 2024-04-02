@@ -1,9 +1,7 @@
 function App() {
-
   return (
     <>
-      <h1>Hola prueba</h1>
-      Hi
+      <h1>Holaa prueba</h1>
     </>
   );
 }
