@@ -2,6 +2,8 @@ on:
   push:
     branches:
       - main
+      - 'dev/*' # Escucha push en cualquier rama que comience con 'dev/'
+
 name: 🚀 Deploy website on push
 
 jobs:
@@ -21,8 +23,10 @@ jobs:
       run: |
         npm install
         npm run build
-    
-    - name: 📂 Sync files
+
+    - name: 📂 Sync files to admin
+      # Condición para ejecutar solo en main y solo después del merge
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.GIT_CPANEL_REACT_SERVER }}
@@ -31,3 +35,15 @@ jobs:
         protocol: ${{ secrets.GIT_CPANEL_REACT_PROTOCOL }}
         local-dir: ./dist/
         server-dir: ./admin/
+
+    - name: 📂 Sync files to pruebas
+      # Condición para ejecutar solo en ramas diferentes a main
+      if: github.ref != 'refs/heads/main'
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.GIT_CPANEL_REACT_SERVER }}
+        username: ${{ secrets.GIT_CPANEL_REACT_USER }}
+        password: ${{ secrets.GIT_CPANEL_REACT_PWD }}
+        protocol: ${{ secrets.GIT_CPANEL_REACT_PROTOCOL }}
+        local-dir: ./dist/
+        server-dir: ./pruebas/admin/
