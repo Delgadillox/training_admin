@@ -1,5 +1,5 @@
 {
-  "homepage": "./encuestas/",
+  "homepage": "./admin/",
   "name": "trainingsfrontend",
   "private": true,
   "version": "0.0.0",
