@@ -2,7 +2,8 @@ function App() {
 
   return (
     <>
-      <h1>Start</h1>
+      <h1>Hola prueba</h1>
+      Hi
     </>
   );
 }
