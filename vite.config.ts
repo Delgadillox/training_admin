@@ -1,8 +1,16 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+// vite.config.ts
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
 export default defineConfig({
-  base: '/admin/',
-  plugins: [react()]
-})
+  plugins: [react()],
+  experimental: {
+    renderBuiltUrl(filename, { hostType }) {
+      if (['js', 'css'].indexOf(hostType) !== -1) {
+        return { runtime: `window.__getFile(${JSON.stringify(filename)})` };
+      } else {
+        return { relative: true };
+      }
+    },
+  },
+});
