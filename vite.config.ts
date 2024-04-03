@@ -1,16 +1,8 @@
-// vite.config.ts
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+console.log('environment', process.env.VITE_ENV)
+// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
-  experimental: {
-    renderBuiltUrl(filename, { hostType }) {
-      if (['js', 'css'].indexOf(hostType) !== -1) {
-        return { runtime: `window.__getFile(${JSON.stringify(filename)})` };
-      } else {
-        return { relative: true };
-      }
-    },
-  },
-});
+  base: process.env.VITE_ENV === "production" ? '/admin/' : '/pruebas/admin',
+  plugins: [react()]
+})
