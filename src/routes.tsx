@@ -5,12 +5,12 @@ import Index from "./pages/Index";
 export const router: CustomRouter[] = [
   {
     title: "Layout",
-    path: "/",
+    path: "/admin/",
     element: <Layout />,
     children: [
       {
         id: "Inicio",
-        path: "/",
+        path: "/admin/",
         index: true,
         element: <Index />,
       },
