@@ -1,0 +1,17 @@
+.sidebar {
+  background-color: #0048bd; 
+  height: 100vh;
+  box-shadow: 0px 0px 20px rgba(11, 1, 100, 0.3);
+  }
+
+  .sidebar .custom-menu-item{
+    color: #fff;
+    font-weight: bold;
+  }
+
+  .sidebar .custom-menu-item:hover{
+    background-color: #000000 !important;
+    color: #000000;
+  }
+
+
