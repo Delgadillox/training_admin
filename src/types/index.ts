@@ -3,5 +3,10 @@ export type CustomRouter = {
   title: string;
   path: string;
   element: JSX.Element;
-  children: RouteObject[];
+  children?: CustomRouteObject[];
+};
+
+export type CustomRouteObject = RouteObject & {
+  icon: JSX.Element;
+  children?: CustomRouteObject[];
 };
