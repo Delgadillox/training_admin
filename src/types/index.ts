@@ -6,7 +6,7 @@ export type CustomRouter = {
   children?: CustomRouteObject[];
 };
 
-export type CustomRouteObject = RouteObject & {
+export type CustomRouteObject = {
   icon: JSX.Element;
   children?: CustomRouteObject[];
-};
+} & RouteObject;
