@@ -15,7 +15,12 @@
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.15",
     "@mui/material": "^5.15.15",
+    "@react-pdf/renderer": "^3.4.4",
+    "axios": "^1.6.8",
+    "chart.js": "^4.4.2",
+    "chartjs-to-image": "^1.2.2",
     "react": "^18.2.0",
+    "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.2.0",
     "react-pro-sidebar": "^1.1.0",
     "react-router-dom": "^6.22.3"

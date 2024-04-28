@@ -1,0 +1,46 @@
+{
+    "id": 1,
+    "name": "Encuesta de Satisfacción Laboral",
+    "date": "2024-04-25",
+    "time": "08:00",
+    "company": "Tech Innovations",
+    "leader": "María Fernández",
+    "questions": [
+      {
+        "id": "1",
+        "question": "¿Está satisfecho con su ambiente de trabajo actual?",
+        "responses": [
+          {
+            "option": "Sí",
+            "count": 75
+          },
+          {
+            "option": "No",
+            "count": 20
+          },
+          {
+            "option": "Indeciso",
+            "count": 5
+          }
+        ]
+      },
+      {
+        "id": "2",
+        "question": "¿Recibe suficiente apoyo de sus superiores?",
+        "responses": [
+          {
+            "option": "Sí",
+            "count": 50
+          },
+          {
+            "option": "No",
+            "count": 30
+          },
+          {
+            "option": "A veces",
+            "count": 20
+          }
+        ]
+      }
+    ]
+  }

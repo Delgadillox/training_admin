@@ -1,10 +1,14 @@
 import { RouteObject } from "react-router-dom";
-export type CustomRouter = {
-  title: string;
+// En ./types/index.ts
+export interface CustomRouter {
+  title?: string;
   path: string;
-  element: JSX.Element;
-  children?: CustomRouteObject[];
-};
+  element: React.ReactNode;
+  icon?: React.ReactNode;
+  id?: string;
+  index?: boolean;
+  children?: CustomRouter[];
+}
 
 export type CustomRouteObject = {
   icon: JSX.Element;

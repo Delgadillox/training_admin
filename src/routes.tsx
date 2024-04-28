@@ -2,12 +2,16 @@ import Layout from "./components/Layout";
 import { CustomRouter } from "./types";
 import Home from "./pages/Home";
 import { New } from "./pages/Encuestas/Index";
+import { Create, List } from "./pages/Reportes/Index";
+import PDFView from "./pages/PDFView";
+
 import {
   Home as HomeIcon,
   Assessment,
   CreateNewFolder,
   QuestionAnswer,
   Add,
+  Summarize,
 } from "@mui/icons-material";
 
 export const router: CustomRouter[] = [
@@ -28,10 +32,16 @@ export const router: CustomRouter[] = [
         path: "/admin/reportes",
         children: [
           {
+            icon: <Summarize />,
+            id: "Ver Reportes",
+            path: "/admin/reportes/ver",
+            element: <List />,
+          },
+          {
             icon: <CreateNewFolder />,
-            id: "Generar reporte",
+            id: "Guardar Reporte",
             path: "/admin/reportes/generar",
-            element: <Home />,
+            element: <Create />,
           },
         ],
       },
@@ -49,5 +59,9 @@ export const router: CustomRouter[] = [
         ],
       },
     ],
+  },
+  {
+    path: "/admin/reporte",
+    element: <PDFView />,
   },
 ];
