@@ -1,5 +1,4 @@
 import Layout from "./components/Layout";
-import { CustomRouter } from "./types";
 import Home from "./pages/Home";
 import { New } from "./pages/Encuestas/Index";
 import { Create, List } from "./pages/Reportes/Index";
@@ -14,7 +13,7 @@ import {
   Summarize,
 } from "@mui/icons-material";
 
-export const router: CustomRouter[] = [
+export const router = [
   {
     title: "Layout",
     path: "/admin/",

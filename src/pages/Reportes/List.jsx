@@ -24,22 +24,13 @@ import {
 import { Edit, Delete, Description } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
-interface Survey {
-  id: number;
-  name: string;
-  date: Date;
-  time: string;
-  company: string;
-  leader: string;
-}
-
 export default function List() {
   const navigate = useNavigate();
-  const [surveys, setSurveys] = useState<Survey[]>([]);
+  const [surveys, setSurveys] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [surveyToDelete, setSurveyToDelete] = useState<Survey | null>(null);
+  const [surveyToDelete, setSurveyToDelete] = useState(null);
   const [filters, setFilters] = useState({
-    selectedDate: null as Date | null,
+    selectedDate: null,
     selectedCompany: "",
     selectedLeader: "",
     selectedTitle: "",
@@ -73,7 +64,7 @@ export default function List() {
     const fetchSurveys = async () => {
       // Aquí harías la llamada a la API para obtener los datos de las encuestas
       // Por ahora, simularemos datos estáticos
-      const initialSurveys: Survey[] = [
+      const initialSurveys = [
         {
           id: 1,
           name: "Encuesta 1",
@@ -105,7 +96,7 @@ export default function List() {
     fetchSurveys();
   }, []);
 
-  const handleDeleteClick = (survey: Survey) => {
+  const handleDeleteClick = (survey) => {
     setSurveyToDelete(survey);
     setDeleteDialogOpen(true);
   };
@@ -122,14 +113,14 @@ export default function List() {
   };
 
   const handleChange = (
-    event: React.ChangeEvent<{ name?: string; value: unknown }>
+    event
   ) => {
-    const name = event.target.name as keyof typeof filters;
+    const name = event.target.name;
     const value = event.target.value;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const filterSurveys = (survey: Survey) => {
+  const filterSurveys = (survey) => {
     return (
       (!filters.selectedDate ||
         survey.date.toISOString().substr(0, 10) ===
