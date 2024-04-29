@@ -4,9 +4,7 @@ import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { router } from "./routes";
 
-const browserRouter = createBrowserRouter(router, {
-  basename: '/admin/'  // Asegúrate de que este es el path correcto donde está servida tu SPA
-});
+const browserRouter = createBrowserRouter(router);
 const container = document.getElementById('root');
 const root = createRoot(container);
 root.render(

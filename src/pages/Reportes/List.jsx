@@ -66,7 +66,8 @@ export default function List() {
       
     }
 
-    navigate(`/admin/reporte?${queryParams.toString()}`);
+    //navigate(`/admin/reporte?${queryParams.toString()}`);
+    window.open(`/admin/reporte?${queryParams.toString()}`, '_blank');
   };
 
   useEffect(() => {
