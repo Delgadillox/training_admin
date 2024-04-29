@@ -1,4 +1,5 @@
 import PieChart from "./PieChart";
+import {transformDateHour} from "../utils"
 
 const PdfDocument = ({ data }) => {
   const handlePrint = () => {
@@ -10,9 +11,10 @@ const PdfDocument = ({ data }) => {
       <button style={styles.printButton} onClick={handlePrint}>
         Imprimir
       </button>
-      <h1 style={styles.title}>{data.title}</h1>
+      <h1 style={styles.title}>{data.name}</h1>
       {data.company && <h2 style={styles.subtitle}>{data.company}</h2>}
       {data.leader && <h2 style={styles.subtitle}>{data.leader}</h2>}
+      {data.date && <h2 style={styles.subtitle}>{transformDateHour(data.date)}</h2>}
       {data.questions.map((question) => (
         <div key={question.id} style={styles.section}>
           <h2 style={styles.title}>{question.question}</h2>

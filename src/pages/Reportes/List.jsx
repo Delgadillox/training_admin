@@ -42,24 +42,28 @@ export default function List() {
     selectedTitle: "",
   });
 
-  const generateReport = (survey, filters = null) => {
+  const generateReport = (survey, params = null) => {
     const queryParams = new URLSearchParams();
-
-    if (filters) {
+    queryParams.set("selectedTitle", filters.selectedTitle);
+    if (params) {
       // Agrega filtros a los parámetros de consulta
-      queryParams.set(
-        "selectedDate",
-        filters.selectedDate
-          ? filters.selectedDate.toISOString().substr(0, 10)
-          : ""
-      );
-      queryParams.set("selectedCompany", filters.selectedCompany);
-      queryParams.set("selectedLeader", filters.selectedLeader);
-      queryParams.set("selectedTitle", filters.selectedTitle);
+      if(filters.selectedDate){
+        queryParams.set(
+          "selectedDate",
+          filters.selectedDate.toISOString().substr(0, 10)
+        );
+      }
+      if(filters.selectedCompany){
+        queryParams.set("selectedCompany", filters.selectedCompany);
+      }
+      if(filters.selectedLeader){
+        queryParams.set("selectedLeader", filters.selectedLeader);
+      }
     }
 
     if (survey) {
       queryParams.set("id", survey.toString());
+      
     }
 
     navigate(`/admin/reporte?${queryParams.toString()}`);
@@ -94,7 +98,6 @@ export default function List() {
         url += `&leader=${filters.selectedLeader}`;
       }
   
-      console.log(url);
       const response = await axios.get(url);
       setSurveys(response.data);
     } else {
@@ -113,14 +116,12 @@ export default function List() {
     const response = await axios.post("https://psicologia-aplicada.com/quizz/psicologia-api/reports/deleteReport.php", {
       id: surveyToDelete,
     });
+    const filteredSurveys = surveys.filter(
+      (survey) => survey.idResultados !== surveyToDelete
+    );
+    setSurveys(filteredSurveys);
+    setSurveyToDelete(null);
     setDeleteDialogOpen(false);
-    if (response.data?.error) {
-      window.alert("Encuesta eliminada correctamente");
-    } else {
-      window.alert("Error al eliminar la encuesta");
-    }
-
-    
   };
 
   const handleDeleteCancel = () => {
