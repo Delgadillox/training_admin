@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Grid,
   Typography,
@@ -14,46 +14,59 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
+import axios from "axios";
 
 const Create = () => {
-  const [formData, setFormData] = useState({
+  const initialState = {
     quizz: "",
     company: "",
     leader: "",
     responses: [],
     timestamp: null,
-  });
-
+  }
+  const [quizzes, setQuizzes] = useState([]);  
+  const [companies, setCompanies] = useState([]);
+  const [leaders, setLeaders] = useState([]);
+  const [formData, setFormData] = useState(initialState);
   const [questions, setQuestions] = useState([]);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
 
+  useEffect(() => {
+    const getResults = async() => {
+      const endpoints = ["https://psicologia-aplicada.com/quizz/psicologia-api/quizz/getAll.php", "https://psicologia-aplicada.com/quizz/psicologia-api/api/getPlants.php"];
+      const responses = await Promise.all(endpoints.map(url=>axios.get(url)));
+      const results = await Promise.all(responses.map(res => {
+        return res.data;
+      }));
+     
+      const [quizzes, companies] = results;
+      console.log(results);
+      const parsedQuizzes = quizzes.map(quiz => ({
+        ...quiz,
+        preguntas: JSON.parse(quiz.preguntas)
+      }));
+
+      setQuizzes(parsedQuizzes);
+      setCompanies(companies);
+    }
+    
+    getResults();
+  }, [])
+  
+
   const handleQuizzChange = (event) => {
     const selectedQuizz = event.target.value;
-    const dummyQuestions = [
-      {
-        id: 1,
-        question: "¿Cómo calificaría nuestro servicio?",
-        options: ["Excelente", "Bueno", "Regular", "Malo"],
-      },
-      {
-        id: 2,
-        question: "¿Qué tan satisfecho está con nuestro producto?",
-        options: [
-          "Muy satisfecho",
-          "Satisfecho",
-          "Neutral",
-          "Insatisfecho",
-          "Muy insatisfecho",
-        ],
-      },
-    ];
+    const questions = quizzes.find(
+      (quizz) => quizz.id === selectedQuizz
+    )?.preguntas;
+    if (!questions) return;
 
-    const optionsObj = dummyQuestions.map((question) => ({
+    const optionsObj = questions.map((question) => ({
       id: question.id,
       options: new Array(question.options.length).fill(0),
     }));
 
-    setQuestions(dummyQuestions);
+    setQuestions(questions);
     setFormData({
       ...formData,
       quizz: selectedQuizz,
@@ -77,6 +90,19 @@ const Create = () => {
     }));
   };
 
+  const handleCompanyChange = async (event) => {
+    const newCompanyId = event.target.value;
+
+    try {
+      const response = await axios.get(`https://psicologia-aplicada.com/quizz/psicologia-api/api/getLideres.php?plant=${newCompanyId}`);
+      setLeaders(response.data);  
+    } catch (error) {
+      console.error('Error fetching leaders:', error);
+    }
+  
+    setFormData({ ...formData, company: newCompanyId, leader: "" });
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
     if (formData.quizz && formData.company && formData.leader) {
@@ -96,9 +122,27 @@ const Create = () => {
     }
   };
 
-  const handleConfirmDialogClose = (confirmed) => {
+  const handleConfirmDialogClose = async(confirmed) => {
     if (confirmed) {
       console.log(formData);
+      try {
+        const res = await axios.post(
+          "https://psicologia-aplicada.com/quizz/psicologia-api/reports/saveReport.php",
+          formData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        window.alert("Reporte creado correctamente");
+        clearState();
+      } catch (error) {
+        console.log(formData, error);
+        window.alert(
+          "Ha ocurrido un error, por favor contactar al administrador"
+        );
+      }
     }
     setConfirmDialogOpen(false);
   };
@@ -114,6 +158,15 @@ const Create = () => {
     }
     return true;
   };
+
+  const clearState = () => {
+    setFormData(initialState);
+    setQuestions([]);
+    setConfirmDialogOpen(false);
+    setQuizzes([]);
+    setCompanies([]);
+    setLeaders([]);
+  }
 
   return (
     <form onSubmit={handleSubmit}>
@@ -132,8 +185,11 @@ const Create = () => {
               onChange={handleQuizzChange}
               fullWidth
             >
-              <MenuItem value={"quizz1"}>Cuestionario 1</MenuItem>
-              <MenuItem value={"quizz2"}>Cuestionario 2</MenuItem>
+              {quizzes.length > 0 && quizzes.map((quizz) => (
+                <MenuItem key={quizz.id} value={quizz.id}>
+                  {quizz.titulo}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
@@ -145,13 +201,14 @@ const Create = () => {
               id="company"
               label="empresa"
               value={formData.company}
-              onChange={(e) =>
-                setFormData({ ...formData, company: e.target.value })
-              }
+              onChange={handleCompanyChange}
               fullWidth
             >
-              <MenuItem value={"company1"}>Empresa 1</MenuItem>
-              <MenuItem value={"company2"}>Empresa 2</MenuItem>
+              {companies.length > 0 && companies.map((company) => (
+                <MenuItem key={company.IdPlanta} value={company.IdPlanta}>
+                  {company.Planta}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>
@@ -168,8 +225,11 @@ const Create = () => {
               }
               fullWidth
             >
-              <MenuItem value={"leader1"}>Líder 1</MenuItem>
-              <MenuItem value={"leader2"}>Líder 2</MenuItem>
+              {leaders.length > 0 && leaders.map((leader) => (
+                <MenuItem key={leader.idLider} value={leader.idLider}>
+                  {leader.Nombre}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Grid>

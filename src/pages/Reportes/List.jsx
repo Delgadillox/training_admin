@@ -23,9 +23,15 @@ import {
 } from "@mui/material";
 import { Edit, Delete, Description } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import { transformDateHour } from "../../utils";
+import axios from "axios";
 
 export default function List() {
   const navigate = useNavigate();
+  const [quizzes, setQuizzes] = useState([]);
+  const [companies, setCompanies] = useState([])
+  const [leaders, setLeaders] = useState([])
+
   const [surveys, setSurveys] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [surveyToDelete, setSurveyToDelete] = useState(null);
@@ -60,51 +66,61 @@ export default function List() {
   };
 
   useEffect(() => {
-    // Simulación de obtención de datos de encuestas
-    const fetchSurveys = async () => {
-      // Aquí harías la llamada a la API para obtener los datos de las encuestas
-      // Por ahora, simularemos datos estáticos
-      const initialSurveys = [
-        {
-          id: 1,
-          name: "Encuesta 1",
-          date: new Date(),
-          time: "08:00",
-          company: "Empresa 1",
-          leader: "Líder 1",
-        },
-        {
-          id: 2,
-          name: "Encuesta 2",
-          date: new Date(),
-          time: "10:00",
-          company: "Empresa 2",
-          leader: "Líder 2",
-        },
-        {
-          id: 3,
-          name: "Encuesta 3",
-          date: new Date(),
-          time: "12:00",
-          company: "Empresa 3",
-          leader: "Líder 3",
-        },
-      ];
-      setSurveys(initialSurveys);
+    const fetchData = async () => {
+      const endpoints = ["https://psicologia-aplicada.com/quizz/psicologia-api/quizz/getAll.php", "https://psicologia-aplicada.com/quizz/psicologia-api/api/getPlants.php"];
+      const responses = await Promise.all(endpoints.map(url=>axios.get(url)));
+      const results = await Promise.all(responses.map(res => {
+        return res.data;
+      }));
+     
+      const [quizzes, companies] = results;
+      setQuizzes(quizzes);
+      setCompanies(companies);
     };
-
-    fetchSurveys();
+    fetchData();
   }, []);
 
-  const handleDeleteClick = (survey) => {
-    setSurveyToDelete(survey);
+  const handleSearchBtn = async () => {
+    if (filters.selectedTitle) {
+      let url = `https://psicologia-aplicada.com/quizz/psicologia-api/reports/getReports.php?quizz=${filters.selectedTitle}`;
+  
+      if (filters.selectedDate) {
+        url += `&date=${filters.selectedDate.toISOString().substr(0, 10)}`;
+      }
+      if (filters.selectedCompany && filters.selectedCompany !== "cualquiera") {
+        url += `&company=${filters.selectedCompany}`;
+      }
+      if (filters.selectedLeader && filters.selectedLeader !== "cualquiera") {
+        url += `&leader=${filters.selectedLeader}`;
+      }
+  
+      console.log(url);
+      const response = await axios.get(url);
+      setSurveys(response.data);
+    } else {
+      window.alert("Debes seleccionar al menos un cuestionario");
+    }
+  };
+  
+
+  const handleDeleteClick = (id) => {
+    setSurveyToDelete(id);
     setDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = () => {
-    // Aquí puedes agregar la lógica para eliminar la encuesta
+  const handleDeleteConfirm = async () => {
     console.log("Encuesta eliminada:", surveyToDelete);
+    const response = await axios.post("https://psicologia-aplicada.com/quizz/psicologia-api/reports/deleteReport.php", {
+      id: surveyToDelete,
+    });
     setDeleteDialogOpen(false);
+    if (response.data?.error) {
+      window.alert("Encuesta eliminada correctamente");
+    } else {
+      window.alert("Error al eliminar la encuesta");
+    }
+
+    
   };
 
   const handleDeleteCancel = () => {
@@ -112,29 +128,25 @@ export default function List() {
     setDeleteDialogOpen(false);
   };
 
-  const handleChange = (
-    event
-  ) => {
+  const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const filterSurveys = (survey) => {
-    return (
-      (!filters.selectedDate ||
-        survey.date.toISOString().substr(0, 10) ===
-          filters.selectedDate.toISOString().substr(0, 10)) &&
-      (!filters.selectedCompany ||
-        survey.company === filters.selectedCompany ||
-        filters.selectedCompany === "cualquiera") &&
-      (!filters.selectedLeader ||
-        survey.leader === filters.selectedLeader ||
-        filters.selectedLeader === "cualquiera")
-    );
+  const handleCompanyChange = async (event) => {
+    const newCompanyId = event.target.value;
+
+    try {
+      const response = await axios.get(`https://psicologia-aplicada.com/quizz/psicologia-api/api/getLideres.php?plant=${newCompanyId}`);
+      setLeaders(response.data);  
+    } catch (error) {
+      console.error('Error fetching leaders:', error);
+    }
+  
+    setFilters({ ...filters, selectedCompany: newCompanyId, selectedLeader: "cualquiera" });
   };
 
-  const filteredSurveys = surveys.filter(filterSurveys);
   return (
     <div>
       <Grid container spacing={2}>
@@ -149,15 +161,12 @@ export default function List() {
               value={filters.selectedTitle}
               onChange={handleChange}
             >
-              <MenuItem value="Encuesta de Satisfacción">
-                Encuesta de Satisfacción
-              </MenuItem>
-              <MenuItem value="Encuesta de Productividad">
-                Encuesta de Productividad
-              </MenuItem>
-              <MenuItem value="Encuesta de Clima Laboral">
-                Encuesta de Clima Laboral
-              </MenuItem>
+              {quizzes.length > 0 &&
+                quizzes.map((quizz) => (
+                  <MenuItem key={quizz.id} value={quizz.id}>
+                    {quizz.titulo}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Grid>
@@ -191,12 +200,16 @@ export default function List() {
               id="company"
               value={filters.selectedCompany}
               label="empresa"
-              onChange={handleChange}
+              onChange={handleCompanyChange}
               name="selectedCompany"
             >
               <MenuItem value="cualquiera">Cualquiera</MenuItem>
-              <MenuItem value="empresa1">Empresa 1</MenuItem>
-              <MenuItem value="empresa2">Empresa 2</MenuItem>
+              {companies.length > 0 &&
+                companies.map((company) => (
+                  <MenuItem key={company.IdPlanta} value={company.IdPlanta}>
+                    {company.Planta}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Grid>
@@ -212,14 +225,18 @@ export default function List() {
               onChange={handleChange}
             >
               <MenuItem value="cualquiera">Cualquiera</MenuItem>
-              <MenuItem value="lider1">Líder 1</MenuItem>
-              <MenuItem value="lider2">Líder 2</MenuItem>
+              {leaders.length > 0 &&
+                leaders.map((leader) => (
+                  <MenuItem key={leader.idLider} value={leader.idLider}>
+                    {leader.Nombre}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Grid>
 
         <Grid item xs={12}>
-          <Button variant="contained" color="primary">
+          <Button variant="contained" color="primary" onClick={handleSearchBtn}>
             Buscar
           </Button>
         </Grid>
@@ -243,20 +260,18 @@ export default function List() {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Nombre</TableCell>
+                  <TableCell>Empresa</TableCell>
+                  <TableCell>Líder</TableCell>
                   <TableCell>Fecha</TableCell>
-                  <TableCell>Hora</TableCell>
                   <TableCell>Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredSurveys.map((survey) => (
-                  <TableRow key={survey.id}>
-                    <TableCell>{survey.name}</TableCell>
-                    <TableCell>
-                      {survey.date.toISOString().substr(0, 10)}
-                    </TableCell>
-                    <TableCell>{survey.time}</TableCell>
+                {surveys.map((survey) => (
+                  <TableRow key={survey.idResultados}>
+                    <TableCell>{survey.company}</TableCell>
+                    <TableCell>{survey.nombre}</TableCell>
+                    <TableCell>{transformDateHour(survey.date)}</TableCell>
                     <TableCell>
                       {/* <IconButton color="primary" aria-label="Editar">
                         <Edit />
@@ -270,7 +285,7 @@ export default function List() {
                       <IconButton
                         color="error"
                         aria-label="Eliminar"
-                        onClick={() => handleDeleteClick(survey)}
+                        onClick={() => handleDeleteClick(survey.id)}
                       >
                         <Delete />
                       </IconButton>

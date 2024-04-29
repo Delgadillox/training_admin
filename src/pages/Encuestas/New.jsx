@@ -91,18 +91,24 @@ function New() {
         title,
         questions,
       };
-      const res = await axios.post(
-        "https://psicologia-aplicada.com/quizz/psicologia-api/quizz/save.php",
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log(res);
-      window.alert("Encuesta creada exitosamente");
-      //clearForm();
+      try {
+        const res = await axios.post(
+          "https://psicologia-aplicada.com/quizz/psicologia-api/quizz/save.php",
+          payload,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        window.alert("Encuesta creada exitosamente");
+        clearForm();
+      } catch (error) {
+        console.log(payload, error);
+        window.alert(
+          "Ha ocurrido un error, por favor contactar al administrador"
+        );
+      }
     } else {
       console.error("Encuesta no válida");
       window.alert(
