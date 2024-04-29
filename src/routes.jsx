@@ -16,7 +16,7 @@ import {
 export const router = [
   {
     title: "Layout",
-    path: "/admin/",
+    path: "/",
     element: <Layout />,
     children: [
       {
@@ -28,18 +28,18 @@ export const router = [
       {
         icon: <Assessment />,
         id: "Reportes",
-        path: "/admin/reportes",
+        path: "/reportes",
         children: [
           {
             icon: <Summarize />,
             id: "Ver Reportes",
-            path: "/admin/reportes/ver",
+            path: "/reportes/ver",
             element: <List />,
           },
           {
             icon: <CreateNewFolder />,
             id: "Guardar Reporte",
-            path: "/admin/reportes/generar",
+            path: "/reportes/generar",
             element: <Create />,
           },
         ],
@@ -47,12 +47,12 @@ export const router = [
       {
         icon: <QuestionAnswer />,
         id: "Encuestas",
-        path: "/admin/encuestas",
+        path: "/encuestas",
         children: [
           {
             icon: <Add />,
             id: "Nueva Encuesta",
-            path: "/admin/encuestas/nueva",
+            path: "/encuestas/nueva",
             element: <New />,
           },
         ],
@@ -60,10 +60,7 @@ export const router = [
     ],
   },
   {
-    path: "/admin/reporte",
+    path: "/reporte",
     element: <PDFView />,
-  },
-  {
-    basename: "/admin",
   }
 ];

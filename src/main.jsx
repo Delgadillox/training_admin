@@ -4,7 +4,9 @@ import "./index.css";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { router } from "./routes";
 
-const browserRouter = createBrowserRouter(router);
+const browserRouter = createBrowserRouter(router, {
+  basename: "/admin",
+});
 const container = document.getElementById('root');
 const root = createRoot(container);
 root.render(
