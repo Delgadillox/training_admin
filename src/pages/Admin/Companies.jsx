@@ -66,29 +66,23 @@ function CompanyForm() {
   };
 
   const handleAddLeader = async () => {
-    const companyIndex = companies.findIndex(
-      (company) => company.id === selectedCompany
-    );
-    if (companyIndex >= 0) {
-      const call = await axios.post(
-        "https://psicologia-aplicada.com/quizz/psicologia-api/api/saveLeader.php",
-        {
-          plant: companyIndex,
-          leader: leaderName,
-        }
-      );
-
-      console.log("leader", call);
-      if (call.data && !call.data.error) {
-        window.alert(call.data.errorMsg);
-      } else if (call.data && call.data.error) {
-        window.alert(call.data.errorMsg);
-      } else {
-        window.alert(
-          "Ha ocurrido un error, por favor contacta al administrador"
-        );
+    const call = await axios.post(
+      "https://psicologia-aplicada.com/quizz/psicologia-api/api/saveLeader.php",
+      {
+        plant: selectedCompany,
+        leader: leaderName,
       }
+    );
+
+    console.log("leader", call);
+    if (call.data && !call.data.error) {
+      window.alert(call.data.errorMsg);
+    } else if (call.data && call.data.error) {
+      window.alert(call.data.errorMsg);
+    } else {
+      window.alert("Ha ocurrido un error, por favor contacta al administrador");
     }
+
     setLeaderName("");
     setSelectedCompany("");
     setOpenDialogLeader(false);
