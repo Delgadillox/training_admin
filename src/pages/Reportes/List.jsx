@@ -277,7 +277,7 @@ export default function List() {
                         <Edit />
                       </IconButton> */}
                       <IconButton
-                        onClick={() => generateReport(survey.id)}
+                        onClick={() => generateReport(survey.idResultados)}
                         aria-label="Generar reporte"
                       >
                         <Description />
@@ -285,7 +285,7 @@ export default function List() {
                       <IconButton
                         color="error"
                         aria-label="Eliminar"
-                        onClick={() => handleDeleteClick(survey.id)}
+                        onClick={() => handleDeleteClick(survey.idResultados)}
                       >
                         <Delete />
                       </IconButton>
