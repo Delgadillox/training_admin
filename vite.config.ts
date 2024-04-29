@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react'
 export default ({ mode }: { mode: string }) => {
 
   return defineConfig({
-    base: '/admin/',
+    base: '/admin',
     plugins: [react()]
   });
 };

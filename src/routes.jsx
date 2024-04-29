@@ -63,4 +63,7 @@ export const router = [
     path: "/admin/reporte",
     element: <PDFView />,
   },
+  {
+    basename: "/admin",
+  }
 ];
