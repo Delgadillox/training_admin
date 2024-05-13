@@ -237,7 +237,7 @@ function CompanyForm() {
       setDataTable(empresasActualizadas);
     } catch (error) {
       console.error("Error al eliminar el líder:", error);
-      window.alert("Ha ocurrido una excepción", error.response?.data?.errorMsg);
+      window.alert("Este líder ya ha sido registrado a un reporte");
     }
   };
 
