@@ -16,6 +16,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import axios from "axios";
+import AdminTable from "../../components/Admin/AdminTable";
 
 function CompanyForm() {
   const [companyName, setCompanyName] = useState("");
@@ -24,6 +25,7 @@ function CompanyForm() {
   const [companies, setCompanies] = useState([]);
   const [openDialogCompany, setOpenDialogCompany] = useState(false);
   const [openDialogLeader, setOpenDialogLeader] = useState(false);
+  const [dataTable, setDataTable] = useState([]);
 
   const getCompanies = async () => {
     const response = await axios.get(
@@ -33,10 +35,39 @@ function CompanyForm() {
     return results;
   };
 
+  const getLideres = async () => {
+    const response = await axios.get(
+      "https://psicologia-aplicada.com/quizz/psicologia-api/api/getAllLideres.php"
+    );
+    const results = response.data;
+    return results;
+  };
+
   useEffect(() => {
     const loadState = async () => {
-      const results = await getCompanies();
-      setCompanies(results);
+      const [companiesResults, lideresResults] = await Promise.all([
+        getCompanies(),
+        getLideres(),
+      ]);
+      setCompanies(companiesResults);
+      const companies = companiesResults.map((company) => ({
+        id: parseInt(company.IdPlanta),
+        empresa: company.Planta,
+        lideres: [],
+      }));
+
+      const lideres = lideresResults.map((lider) => ({
+        id: lider.idLider,
+        nombre: lider.Nombre,
+        idPlanta: parseInt(lider.idPlanta),
+      }));
+
+      const combinedResults = companies.map((company) => ({
+        ...company,
+        lideres: lideres.filter((lider) => lider.idPlanta === company.id),
+      }));
+
+      setDataTable(combinedResults);
     };
 
     loadState();
@@ -94,6 +125,48 @@ function CompanyForm() {
 
   const handleOpenDialogLeader = () => {
     setOpenDialogLeader(true);
+  };
+
+  const handleEditEmpresa = (id, newName) => {
+    const updatedEmpresas = dataTable.map((empresa) => {
+      if (empresa.id === id) {
+        return { ...empresa, empresa: newName };
+      }
+      return empresa;
+    });
+    setDataTable(updatedEmpresas);
+  };
+
+  const handleDeleteEmpresa = (id) => {
+    const updatedEmpresas = dataTable.filter((empresa) => empresa.id !== id);
+    setDataTable(updatedEmpresas);
+  };
+
+  const handleEditLider = (liderId, nuevoNombre) => {
+    const empresasActualizadas = dataTable.map((empresa) => {
+      const lideresActualizados = dataTable.lideres.map((lider) => {
+        if (lider.id === liderId) {
+          return { ...lider, nombre: nuevoNombre };
+        }
+        return lider;
+      });
+
+      return { ...empresa, lideres: lideresActualizados };
+    });
+
+    setDataTable(empresasActualizadas);
+  };
+
+  const handleDeleteLider = (liderId) => {
+    const empresasActualizadas = dataTable.map((empresa) => {
+      const lideresActualizados = empresa.lideres.filter(
+        (lider) => lider.id !== liderId
+      );
+
+      return { ...empresa, lideres: lideresActualizados };
+    });
+
+    setDataTable(empresasActualizadas);
   };
 
   return (
@@ -200,6 +273,18 @@ function CompanyForm() {
               </Button>
             </DialogActions>
           </Dialog>
+        </Grid>
+      </Grid>
+      <br />
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <AdminTable
+            empresas={dataTable}
+            handleEditEmpresa={handleEditEmpresa}
+            handleDeleteEmpresa={handleDeleteEmpresa}
+            handleEditLider={handleEditLider}
+            handleDeleteLider={handleDeleteLider}
+          />
         </Grid>
       </Grid>
     </Container>

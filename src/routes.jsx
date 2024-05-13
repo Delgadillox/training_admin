@@ -2,7 +2,7 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import { New } from "./pages/Encuestas/Index";
 import { Create, List } from "./pages/Reportes/Index";
-import {Companies} from "./pages/Admin/Index";
+import { Companies } from "./pages/Admin/Index";
 import PDFView from "./pages/PDFView";
 
 import {
@@ -26,6 +26,7 @@ export const router = [
         icon: <HomeIcon />,
         id: "Inicio",
         index: true,
+        path: "/",
         element: <Home />,
       },
       {
@@ -63,20 +64,20 @@ export const router = [
       {
         icon: <AdminPanelSettings />,
         id: "Admin",
-        path:"/panel",
+        path: "/panel",
         children: [
           {
             icon: <GroupAdd />,
-            id:"Registrar líder/empresa",
-            path:"/panel/leaders",
-            element: <Companies />
-          }
-        ]
-      }
+            id: "Registrar líder/empresa",
+            path: "/panel/leaders",
+            element: <Companies />,
+          },
+        ],
+      },
     ],
   },
   {
     path: "/reporte",
     element: <PDFView />,
-  }
+  },
 ];

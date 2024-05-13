@@ -29,8 +29,8 @@ import axios from "axios";
 export default function List() {
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState([]);
-  const [companies, setCompanies] = useState([])
-  const [leaders, setLeaders] = useState([])
+  const [companies, setCompanies] = useState([]);
+  const [leaders, setLeaders] = useState([]);
 
   const [surveys, setSurveys] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -47,37 +47,43 @@ export default function List() {
     queryParams.set("selectedTitle", filters.selectedTitle);
     if (params) {
       // Agrega filtros a los parámetros de consulta
-      if(filters.selectedDate){
+      if (filters.selectedDate) {
         queryParams.set(
           "selectedDate",
           filters.selectedDate.toISOString().substr(0, 10)
         );
       }
-      if(filters.selectedCompany){
+      if (filters.selectedCompany) {
         queryParams.set("selectedCompany", filters.selectedCompany);
       }
-      if(filters.selectedLeader){
+      if (filters.selectedLeader) {
         queryParams.set("selectedLeader", filters.selectedLeader);
       }
     }
 
     if (survey) {
       queryParams.set("id", survey.toString());
-      
     }
 
     //navigate(`/admin/reporte?${queryParams.toString()}`);
-    window.open(`/admin/reporte?${queryParams.toString()}`, '_blank');
+    window.open(`/admin/reporte?${queryParams.toString()}`, "_blank");
   };
 
   useEffect(() => {
     const fetchData = async () => {
-      const endpoints = ["https://psicologia-aplicada.com/quizz/psicologia-api/quizz/getAll.php", "https://psicologia-aplicada.com/quizz/psicologia-api/api/getPlants.php"];
-      const responses = await Promise.all(endpoints.map(url=>axios.get(url)));
-      const results = await Promise.all(responses.map(res => {
-        return res.data;
-      }));
-     
+      const endpoints = [
+        "https://psicologia-aplicada.com/quizz/psicologia-api/quizz/getAll.php",
+        "https://psicologia-aplicada.com/quizz/psicologia-api/api/getPlants.php",
+      ];
+      const responses = await Promise.all(
+        endpoints.map((url) => axios.get(url))
+      );
+      const results = await Promise.all(
+        responses.map((res) => {
+          return res.data;
+        })
+      );
+
       const [quizzes, companies] = results;
       setQuizzes(quizzes);
       setCompanies(companies);
@@ -88,7 +94,7 @@ export default function List() {
   const handleSearchBtn = async () => {
     if (filters.selectedTitle) {
       let url = `https://psicologia-aplicada.com/quizz/psicologia-api/reports/getReports.php?quizz=${filters.selectedTitle}`;
-  
+
       if (filters.selectedDate) {
         url += `&date=${filters.selectedDate.toISOString().substr(0, 10)}`;
       }
@@ -98,25 +104,32 @@ export default function List() {
       if (filters.selectedLeader && filters.selectedLeader !== "cualquiera") {
         url += `&leader=${filters.selectedLeader}`;
       }
-  
+
       const response = await axios.get(url);
+      console.log(response);
       setSurveys(response.data);
     } else {
       window.alert("Debes seleccionar al menos un cuestionario");
     }
   };
-  
 
   const handleDeleteClick = (id) => {
     setSurveyToDelete(id);
     setDeleteDialogOpen(true);
   };
 
+  const handleEditClick = (quizz, report) => {
+    navigate(`/reportes/generar?quizz=${quizz}&id=${report}`);
+  };
+
   const handleDeleteConfirm = async () => {
     console.log("Encuesta eliminada:", surveyToDelete);
-    const response = await axios.post("https://psicologia-aplicada.com/quizz/psicologia-api/reports/deleteReport.php", {
-      id: surveyToDelete,
-    });
+    const response = await axios.post(
+      "https://psicologia-aplicada.com/quizz/psicologia-api/reports/deleteReport.php",
+      {
+        id: surveyToDelete,
+      }
+    );
     const filteredSurveys = surveys.filter(
       (survey) => survey.idResultados !== surveyToDelete
     );
@@ -140,13 +153,19 @@ export default function List() {
     const newCompanyId = event.target.value;
 
     try {
-      const response = await axios.get(`https://psicologia-aplicada.com/quizz/psicologia-api/api/getLideres.php?plant=${newCompanyId}`);
-      setLeaders(response.data);  
+      const response = await axios.get(
+        `https://psicologia-aplicada.com/quizz/psicologia-api/api/getLideres.php?plant=${newCompanyId}`
+      );
+      setLeaders(response.data);
     } catch (error) {
-      console.error('Error fetching leaders:', error);
+      console.error("Error fetching leaders:", error);
     }
-  
-    setFilters({ ...filters, selectedCompany: newCompanyId, selectedLeader: "cualquiera" });
+
+    setFilters({
+      ...filters,
+      selectedCompany: newCompanyId,
+      selectedLeader: "cualquiera",
+    });
   };
 
   return (
@@ -275,9 +294,18 @@ export default function List() {
                     <TableCell>{survey.nombre}</TableCell>
                     <TableCell>{transformDateHour(survey.date)}</TableCell>
                     <TableCell>
-                      {/* <IconButton color="primary" aria-label="Editar">
+                      <IconButton
+                        color="primary"
+                        aria-label="Editar"
+                        onClick={() =>
+                          handleEditClick(
+                            survey.idEncuesta,
+                            survey.idResultados
+                          )
+                        }
+                      >
                         <Edit />
-                      </IconButton> */}
+                      </IconButton>
                       <IconButton
                         onClick={() => generateReport(survey.idResultados)}
                         aria-label="Generar reporte"

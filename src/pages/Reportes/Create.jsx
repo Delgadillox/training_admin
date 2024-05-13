@@ -23,36 +23,89 @@ const Create = () => {
     leader: "",
     responses: [],
     timestamp: null,
-  }
-  const [quizzes, setQuizzes] = useState([]);  
+  };
+  const [quizzes, setQuizzes] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [leaders, setLeaders] = useState([]);
   const [formData, setFormData] = useState(initialState);
   const [questions, setQuestions] = useState([]);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editId, setEditId] = useState(0);
 
   useEffect(() => {
-    const getResults = async() => {
-      const endpoints = ["https://psicologia-aplicada.com/quizz/psicologia-api/quizz/getAll.php", "https://psicologia-aplicada.com/quizz/psicologia-api/api/getPlants.php"];
-      const responses = await Promise.all(endpoints.map(url=>axios.get(url)));
-      const results = await Promise.all(responses.map(res => {
-        return res.data;
-      }));
-     
+    const getResults = async () => {
+      const endpoints = [
+        "https://psicologia-aplicada.com/quizz/psicologia-api/quizz/getAll.php",
+        "https://psicologia-aplicada.com/quizz/psicologia-api/api/getPlants.php",
+      ];
+      const responses = await Promise.all(
+        endpoints.map((url) => axios.get(url))
+      );
+      const results = await Promise.all(
+        responses.map((res) => {
+          return res.data;
+        })
+      );
+
       const [quizzes, companies] = results;
       console.log(results);
-      const parsedQuizzes = quizzes.map(quiz => ({
+      const parsedQuizzes = quizzes.map((quiz) => ({
         ...quiz,
-        preguntas: JSON.parse(quiz.preguntas)
+        preguntas: JSON.parse(quiz.preguntas),
       }));
 
       setQuizzes(parsedQuizzes);
       setCompanies(companies);
-    }
-    
+    };
+
     getResults();
-  }, [])
-  
+
+    const queryParams = new URLSearchParams(window.location.search);
+    const reportId = queryParams.get("id");
+    const quizzId = queryParams.get("quizz");
+
+    const getSearchData = async (quizz, report) => {
+      try {
+        const endpoints = [
+          `https://psicologia-aplicada.com/quizz/psicologia-api/reports/getReports.php?quizz=${quizz}&resultId=${report}`,
+          `https://psicologia-aplicada.com/quizz/psicologia-api/quizz/getQuestions.php?id=${quizz}`,
+        ];
+        const responses = await Promise.all(
+          endpoints.map((url) => axios.get(url))
+        );
+        const results = await Promise.all(
+          responses.map((res) => {
+            return res.data;
+          })
+        );
+        const [reportData, questions] = results;
+        const { idEncuesta, idLider, idLiderCompany, resultados } =
+          reportData[0];
+        const { preguntas } = questions[0];
+        const response = await axios.get(
+          `https://psicologia-aplicada.com/quizz/psicologia-api/api/getLideres.php?plant=${idLiderCompany}`
+        );
+
+        setLeaders(response.data);
+        setQuestions(JSON.parse(preguntas));
+        setFormData({
+          quizz: idEncuesta,
+          company: idLiderCompany,
+          leader: idLider,
+          responses: JSON.parse(resultados),
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (reportId) {
+      setEditId(reportId);
+      setIsEditing(true); // Activamos el modo edición
+      getSearchData(quizzId, reportId);
+    }
+  }, []);
 
   const handleQuizzChange = (event) => {
     const selectedQuizz = event.target.value;
@@ -94,12 +147,14 @@ const Create = () => {
     const newCompanyId = event.target.value;
 
     try {
-      const response = await axios.get(`https://psicologia-aplicada.com/quizz/psicologia-api/api/getLideres.php?plant=${newCompanyId}`);
-      setLeaders(response.data);  
+      const response = await axios.get(
+        `https://psicologia-aplicada.com/quizz/psicologia-api/api/getLideres.php?plant=${newCompanyId}`
+      );
+      setLeaders(response.data);
     } catch (error) {
-      console.error('Error fetching leaders:', error);
+      console.error("Error fetching leaders:", error);
     }
-  
+
     setFormData({ ...formData, company: newCompanyId, leader: "" });
   };
 
@@ -122,19 +177,24 @@ const Create = () => {
     }
   };
 
-  const handleConfirmDialogClose = async(confirmed) => {
+  const handleConfirmDialogClose = async (confirmed) => {
     if (confirmed) {
       console.log(formData);
       try {
-        const res = await axios.post(
-          "https://psicologia-aplicada.com/quizz/psicologia-api/reports/saveReport.php",
-          formData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        let url = "";
+        if (isEditing) {
+          url =
+            "https://psicologia-aplicada.com/quizz/psicologia-api/reports/updateReport.php?id=" +
+            editId;
+        } else {
+          url =
+            "https://psicologia-aplicada.com/quizz/psicologia-api/reports/saveReport.php";
+        }
+        const res = await axios.post(url, formData, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
         window.alert("Reporte creado correctamente");
         clearState();
       } catch (error) {
@@ -166,7 +226,7 @@ const Create = () => {
     setQuizzes([]);
     setCompanies([]);
     setLeaders([]);
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -184,12 +244,14 @@ const Create = () => {
               value={formData.quizz}
               onChange={handleQuizzChange}
               fullWidth
+              disabled={isEditing}
             >
-              {quizzes.length > 0 && quizzes.map((quizz) => (
-                <MenuItem key={quizz.id} value={quizz.id}>
-                  {quizz.titulo}
-                </MenuItem>
-              ))}
+              {quizzes.length > 0 &&
+                quizzes.map((quizz) => (
+                  <MenuItem key={quizz.id} value={quizz.id}>
+                    {quizz.titulo}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Grid>
@@ -203,12 +265,14 @@ const Create = () => {
               value={formData.company}
               onChange={handleCompanyChange}
               fullWidth
+              disabled={isEditing}
             >
-              {companies.length > 0 && companies.map((company) => (
-                <MenuItem key={company.IdPlanta} value={company.IdPlanta}>
-                  {company.Planta}
-                </MenuItem>
-              ))}
+              {companies.length > 0 &&
+                companies.map((company) => (
+                  <MenuItem key={company.IdPlanta} value={company.IdPlanta}>
+                    {company.Planta}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Grid>
@@ -224,12 +288,14 @@ const Create = () => {
                 setFormData({ ...formData, leader: e.target.value })
               }
               fullWidth
+              disabled={isEditing}
             >
-              {leaders.length > 0 && leaders.map((leader) => (
-                <MenuItem key={leader.idLider} value={leader.idLider}>
-                  {leader.Nombre}
-                </MenuItem>
-              ))}
+              {leaders.length > 0 &&
+                leaders.map((leader) => (
+                  <MenuItem key={leader.idLider} value={leader.idLider}>
+                    {leader.Nombre}
+                  </MenuItem>
+                ))}
             </Select>
           </FormControl>
         </Grid>
@@ -268,7 +334,7 @@ const Create = () => {
         ))}
         <Grid item xs={12}>
           <Button variant="contained" color="primary" type="submit" fullWidth>
-            Guardar Respuestas
+            {isEditing ? "Actualizar Cambios" : "Guardar Reporte"}
           </Button>
         </Grid>
       </Grid>
