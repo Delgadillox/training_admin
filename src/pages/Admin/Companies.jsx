@@ -127,46 +127,118 @@ function CompanyForm() {
     setOpenDialogLeader(true);
   };
 
-  const handleEditEmpresa = (id, newName) => {
-    const updatedEmpresas = dataTable.map((empresa) => {
-      if (empresa.id === id) {
-        return { ...empresa, empresa: newName };
+  const handleEditEmpresa = async (id, newName) => {
+    try {
+      if (newName.length < 1) {
+        return window.alert("El nombre de la empresa no puede estar vacío");
       }
-      return empresa;
-    });
-    setDataTable(updatedEmpresas);
-  };
-
-  const handleDeleteEmpresa = (id) => {
-    const updatedEmpresas = dataTable.filter((empresa) => empresa.id !== id);
-    setDataTable(updatedEmpresas);
-  };
-
-  const handleEditLider = (liderId, nuevoNombre) => {
-    const empresasActualizadas = dataTable.map((empresa) => {
-      const lideresActualizados = dataTable.lideres.map((lider) => {
-        if (lider.id === liderId) {
-          return { ...lider, nombre: nuevoNombre };
+      const call = await axios.post(
+        "https://psicologia-aplicada.com/quizz/psicologia-api/api/updatePlant.php",
+        {
+          id: id,
+          name: newName,
         }
-        return lider;
+      );
+      const response = call.data;
+      if (response.error) {
+        window.alert(response.errorMsg);
+      }
+      const updatedEmpresas = dataTable.map((empresa) => {
+        if (empresa.id === id) {
+          return { ...empresa, empresa: newName };
+        }
+        return empresa;
+      });
+      setDataTable(updatedEmpresas);
+    } catch (error) {
+      console.error("Error al editar la empresa:", error);
+      window.alert("Ha ocurrido un error, por favor contacta al administrador");
+    }
+  };
+
+  const handleDeleteEmpresa = async (id) => {
+    try {
+      const call = await axios.post(
+        "https://psicologia-aplicada.com/quizz/psicologia-api/api/deletePlant.php",
+        {
+          id: id,
+        }
+      );
+      const response = call.data;
+      if (response.error) {
+        window.alert(response.errorMsg);
+      }
+      const updatedEmpresas = dataTable.filter((empresa) => empresa.id !== id);
+      setDataTable(updatedEmpresas);
+    } catch (error) {
+      console.error("Error al eliminar la empresa:", error);
+      window.alert("Ha ocurrido un error, por favor contacta al administrador");
+    }
+  };
+
+  const handleEditLider = async (liderId, nuevoNombre) => {
+    try {
+      if (nuevoNombre.length < 1) {
+        return window.alert("El nombre del líder no puede estar vacío");
+      }
+      const call = await axios.post(
+        "https://psicologia-aplicada.com/quizz/psicologia-api/api/updateLeader.php",
+        {
+          id: liderId,
+          name: nuevoNombre,
+        }
+      );
+      const response = call.data;
+      if (response.error) {
+        window.alert(response.errorMsg);
+      }
+      const empresasActualizadas = dataTable.map((empresa) => {
+        if (empresa.lideres.length < 1) {
+          return empresa;
+        }
+
+        const lideresActualizados = empresa.lideres.map((lider) => {
+          if (lider.id === liderId) {
+            return { ...lider, nombre: nuevoNombre };
+          }
+          return lider;
+        });
+
+        return { ...empresa, lideres: lideresActualizados };
+      });
+      setDataTable(empresasActualizadas);
+      console.log(empresasActualizadas);
+    } catch (error) {
+      console.error("Error al editar el líder:", error);
+      window.alert("Ha ocurrido un error, por favor contacta al administrador");
+    }
+  };
+
+  const handleDeleteLider = async (liderId) => {
+    try {
+      const call = await axios.post(
+        "https://psicologia-aplicada.com/quizz/psicologia-api/api/deleteLeader.php",
+        {
+          id: liderId,
+        }
+      );
+      const response = call.data;
+      if (response.error) {
+        window.alert(response.errorMsg);
+      }
+      const empresasActualizadas = dataTable.map((empresa) => {
+        const lideresActualizados = empresa.lideres.filter(
+          (lider) => lider.id !== liderId
+        );
+
+        return { ...empresa, lideres: lideresActualizados };
       });
 
-      return { ...empresa, lideres: lideresActualizados };
-    });
-
-    setDataTable(empresasActualizadas);
-  };
-
-  const handleDeleteLider = (liderId) => {
-    const empresasActualizadas = dataTable.map((empresa) => {
-      const lideresActualizados = empresa.lideres.filter(
-        (lider) => lider.id !== liderId
-      );
-
-      return { ...empresa, lideres: lideresActualizados };
-    });
-
-    setDataTable(empresasActualizadas);
+      setDataTable(empresasActualizadas);
+    } catch (error) {
+      console.error("Error al eliminar el líder:", error);
+      window.alert("Ha ocurrido un error, por favor contacta al administrador");
+    }
   };
 
   return (
