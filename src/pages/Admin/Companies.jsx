@@ -141,7 +141,7 @@ function CompanyForm() {
       );
       const response = call.data;
       if (response.error) {
-        window.alert(response.errorMsg);
+        return window.alert(response.errorMsg);
       }
       const updatedEmpresas = dataTable.map((empresa) => {
         if (empresa.id === id) {
@@ -166,7 +166,7 @@ function CompanyForm() {
       );
       const response = call.data;
       if (response.error) {
-        window.alert(response.errorMsg);
+        return window.alert(response.errorMsg);
       }
       const updatedEmpresas = dataTable.filter((empresa) => empresa.id !== id);
       setDataTable(updatedEmpresas);
@@ -190,7 +190,7 @@ function CompanyForm() {
       );
       const response = call.data;
       if (response.error) {
-        window.alert(response.errorMsg);
+        return window.alert(response.errorMsg);
       }
       const empresasActualizadas = dataTable.map((empresa) => {
         if (empresa.lideres.length < 1) {
@@ -224,7 +224,7 @@ function CompanyForm() {
       );
       const response = call.data;
       if (response.error) {
-        window.alert(response.errorMsg);
+        return window.alert(response.errorMsg);
       }
       const empresasActualizadas = dataTable.map((empresa) => {
         const lideresActualizados = empresa.lideres.filter(
@@ -237,7 +237,7 @@ function CompanyForm() {
       setDataTable(empresasActualizadas);
     } catch (error) {
       console.error("Error al eliminar el líder:", error);
-      window.alert("Ha ocurrido un error, por favor contacta al administrador");
+      window.alert("Ha ocurrido una excepción", error.response?.data?.errorMsg);
     }
   };
 
