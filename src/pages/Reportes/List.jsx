@@ -7,31 +7,21 @@ import {
   FormControl,
   InputLabel,
   Grid,
-  Table,
-  TableContainer,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
   Divider,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import { Edit, Delete, Description } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { transformDateHour } from "../../utils";
 import axios from "axios";
+import SurveyTable from "../../components/Reportes/SurveyTable";
 
 export default function List() {
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [leaders, setLeaders] = useState([]);
-
   const [surveys, setSurveys] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [surveyToDelete, setSurveyToDelete] = useState(null);
@@ -41,6 +31,10 @@ export default function List() {
     selectedLeader: "",
     selectedTitle: "",
   });
+
+  const [selectedSurveys, setSelectedSurveys] = useState([]);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const generateReport = (survey, params = null) => {
     const queryParams = new URLSearchParams();
@@ -67,6 +61,14 @@ export default function List() {
 
     //navigate(`/admin/reporte?${queryParams.toString()}`);
     window.open(`/admin/reporte?${queryParams.toString()}`, "_blank");
+  };
+
+  const generateDynamicReport = (surveyIds) => {
+    const queryParams = new URLSearchParams();
+    queryParams.set("selectedTitle", filters.selectedTitle);
+    queryParams.set("id", surveyIds.toString());
+
+    window.open(`/admin/reporteDinamico?${queryParams.toString()}`, "_blank");
   };
 
   useEffect(() => {
@@ -166,6 +168,34 @@ export default function List() {
       selectedCompany: newCompanyId,
       selectedLeader: "cualquiera",
     });
+  };
+
+  const handleSelectSurvey = (id) => {
+    setSelectedSurveys((prevSelected) => {
+      if (prevSelected.includes(id)) {
+        return prevSelected.filter((selectedId) => selectedId !== id);
+      } else {
+        return [...prevSelected, id];
+      }
+    });
+  };
+
+  const handleSelectAllSurveys = (event) => {
+    if (event.target.checked) {
+      const newSelectedSurveys = surveys.map((survey) => survey.idResultados);
+      setSelectedSurveys(newSelectedSurveys);
+    } else {
+      setSelectedSurveys([]);
+    }
+  };
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   return (
@@ -277,54 +307,20 @@ export default function List() {
         </Grid>
 
         <Grid item xs={12}>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Empresa</TableCell>
-                  <TableCell>Líder</TableCell>
-                  <TableCell>Fecha</TableCell>
-                  <TableCell>Acciones</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {surveys.map((survey) => (
-                  <TableRow key={survey.idResultados}>
-                    <TableCell>{survey.company}</TableCell>
-                    <TableCell>{survey.nombre}</TableCell>
-                    <TableCell>{transformDateHour(survey.date)}</TableCell>
-                    <TableCell>
-                      <IconButton
-                        color="primary"
-                        aria-label="Editar"
-                        onClick={() =>
-                          handleEditClick(
-                            survey.idEncuesta,
-                            survey.idResultados
-                          )
-                        }
-                      >
-                        <Edit />
-                      </IconButton>
-                      <IconButton
-                        onClick={() => generateReport(survey.idResultados)}
-                        aria-label="Generar reporte"
-                      >
-                        <Description />
-                      </IconButton>
-                      <IconButton
-                        color="error"
-                        aria-label="Eliminar"
-                        onClick={() => handleDeleteClick(survey.idResultados)}
-                      >
-                        <Delete />
-                      </IconButton>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <SurveyTable
+            surveys={surveys}
+            selectedSurveys={selectedSurveys}
+            handleSelectSurvey={handleSelectSurvey}
+            handleSelectAllSurveys={handleSelectAllSurveys}
+            handleEditClick={handleEditClick}
+            handleDeleteClick={handleDeleteClick}
+            generateReport={generateReport}
+            generateDynamicReport={generateDynamicReport}
+            page={page}
+            rowsPerPage={rowsPerPage}
+            handleChangePage={handleChangePage}
+            handleChangeRowsPerPage={handleChangeRowsPerPage}
+          />
         </Grid>
       </Grid>
 

@@ -4,6 +4,7 @@ import { New } from "./pages/Encuestas/Index";
 import { Create, List } from "./pages/Reportes/Index";
 import { Companies } from "./pages/Admin/Index";
 import PDFView from "./pages/PDFView";
+import DynamicView from "./pages/Reportes/DynamicView";
 
 import {
   Home as HomeIcon,
@@ -79,5 +80,9 @@ export const router = [
   {
     path: "/reporte",
     element: <PDFView />,
+  },
+  {
+    path: "/reporteDinamico",
+    element: <DynamicView />,
   },
 ];

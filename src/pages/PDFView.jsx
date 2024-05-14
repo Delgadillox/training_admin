@@ -3,7 +3,6 @@ import PdfDocument from "../components/PDF";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
 
-
 const PDFView = () => {
   const location = useLocation();
   const query = new URLSearchParams(location.search);
@@ -21,7 +20,6 @@ const PDFView = () => {
     selectedTitle,
   };
 
-  
   const [surveyData, setSurveyData] = useState({});
 
   useEffect(() => {
@@ -41,7 +39,8 @@ const PDFView = () => {
           date = filters.selectedDate;
         }
         if (
-          filters.selectedCompany && filters.selectedCompany !== "" &&
+          filters.selectedCompany &&
+          filters.selectedCompany !== "" &&
           filters.selectedCompany !== "cualquiera"
         ) {
           urlResponses += `&company=${filters.selectedCompany}`;
@@ -66,11 +65,12 @@ const PDFView = () => {
 
       const [reports, questions] = results;
       const preguntas = JSON.parse(questions[0].preguntas);
-      if(reports.length === 1){
+      if (reports.length === 1) {
         date = reports[0].date;
         company = reports[0].company;
         leader = reports[0].nombre;
       }
+      console.log(reports, questions);
       // Paso 1: Convertir strings de resultados en objetos y sumar los resultados
       const summedResults = reports.reduce((acc, report) => {
         const resultados = JSON.parse(report.resultados);
@@ -84,7 +84,7 @@ const PDFView = () => {
         });
         return acc;
       }, {});
-      
+
       // Paso 2: Combinar los resultados sumados con las preguntas
       const finalQuestions = preguntas.map((question) => {
         const responses = summedResults[question.id].map((count, index) => ({
@@ -98,15 +98,15 @@ const PDFView = () => {
         };
       });
 
-
       const finalReport = {
         id: 1,
         name: reports[0].titulo,
         date: date,
         company: company,
         leader: leader,
-        questions: finalQuestions
+        questions: finalQuestions,
       };
+
       setSurveyData(finalReport);
     };
 
