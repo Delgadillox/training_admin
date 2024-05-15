@@ -54,8 +54,10 @@ const SurveyList = () => {
       fetchSurveys();
       handleClose();
     } catch (error) {
-      console.error("Error al eliminar la empresa:", error);
-      window.alert("Ha ocurrido un error, por favor contacta al administrador");
+      console.error("Error al eliminar la encuesta:", error);
+      window.alert(
+        "La encuestra se encuentra en uso actualmente, no se puede eliminar"
+      );
     }
   };
 
