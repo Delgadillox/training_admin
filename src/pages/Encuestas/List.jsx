@@ -42,7 +42,7 @@ const SurveyList = () => {
   const handleDelete = async () => {
     try {
       const call = await axios.post(
-        "https://psicologia-aplicada.com/quizz/psicologia-api/quizz/deletePlant.php",
+        "https://psicologia-aplicada.com/quizz/psicologia-api/quizz/deleteQuizz.php",
         {
           id: selectedSurveyId,
         }
