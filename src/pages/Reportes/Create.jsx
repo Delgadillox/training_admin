@@ -21,6 +21,7 @@ const Create = () => {
     quizz: "",
     company: "",
     leader: "",
+    comments: "",
     responses: [],
     timestamp: null,
   };
@@ -297,6 +298,24 @@ const Create = () => {
                   </MenuItem>
                 ))}
             </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={12}>
+          <Divider />
+        </Grid>
+        <Grid item xs={12}>
+          <FormControl fullWidth>
+            <TextField
+              id="outlined-multiline-static"
+              label="Comentarios"
+              multiline
+              rows={4}
+              value={formData.comments}
+              onChange={(e) =>
+                setFormData({ ...formData, comments: e.target.value })
+              }
+              fullWidth
+            />
           </FormControl>
         </Grid>
         <Grid item xs={12}>
