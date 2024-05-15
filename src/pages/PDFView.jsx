@@ -28,6 +28,7 @@ const PDFView = () => {
       let date = "";
       let company = "";
       let leader = "";
+      let comments = "";
 
       if (filters.id) {
         urlResponses = `https://psicologia-aplicada.com/quizz/psicologia-api/reports/getReports.php?quizz=${filters.selectedTitle}&resultId=${filters.id}`;
@@ -69,6 +70,7 @@ const PDFView = () => {
         date = reports[0].date;
         company = reports[0].company;
         leader = reports[0].nombre;
+        comments = reports[0].comments;
       }
       console.log(reports, questions);
       // Paso 1: Convertir strings de resultados en objetos y sumar los resultados
@@ -98,12 +100,15 @@ const PDFView = () => {
         };
       });
 
+      if (!filters.id) comments = "";
+
       const finalReport = {
         id: 1,
         name: reports[0].titulo,
         date: date,
         company: company,
         leader: leader,
+        comments: comments,
         questions: finalQuestions,
       };
 

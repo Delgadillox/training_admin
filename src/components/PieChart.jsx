@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import Chart from "chart.js/auto";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
-const PieChart = ({ responses }) => {
+const PieChart = ({ responses, colors }) => {
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -22,8 +22,7 @@ const PieChart = ({ responses }) => {
           datasets: [
             {
               data: responses.map((r) => r.count),
-              backgroundColor: ["#008f39", "#e6cc00", "#ff0000"],
-              hoverBackgroundColor: ["darkgreen", "#8B8000", "darkred"],
+              backgroundColor: colors,
             },
           ],
         },
@@ -59,7 +58,7 @@ const PieChart = ({ responses }) => {
         chart.destroy();
       };
     }
-  }, [responses]);
+  }, [responses, colors]); // Agregar 'colors' como dependencia
 
   return <canvas ref={chartRef}></canvas>;
 };

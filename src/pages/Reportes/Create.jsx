@@ -81,7 +81,7 @@ const Create = () => {
           })
         );
         const [reportData, questions] = results;
-        const { idEncuesta, idLider, idLiderCompany, resultados } =
+        const { idEncuesta, idLider, idLiderCompany, resultados, comments } =
           reportData[0];
         const { preguntas } = questions[0];
         const response = await axios.get(
@@ -94,6 +94,7 @@ const Create = () => {
           quizz: idEncuesta,
           company: idLiderCompany,
           leader: idLider,
+          comments: comments,
           responses: JSON.parse(resultados),
         });
       } catch (error) {

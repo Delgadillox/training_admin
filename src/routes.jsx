@@ -1,6 +1,6 @@
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
-import { New } from "./pages/Encuestas/Index";
+import { New, List as ListQuizz } from "./pages/Encuestas/Index";
 import { Create, List } from "./pages/Reportes/Index";
 import { Companies } from "./pages/Admin/Index";
 import PDFView from "./pages/PDFView";
@@ -59,6 +59,12 @@ export const router = [
             id: "Nueva Encuesta",
             path: "/encuestas/nueva",
             element: <New />,
+          },
+          {
+            icon: <Summarize />,
+            id: "Ver Encuestas",
+            path: "/encuestas/ver",
+            element: <ListQuizz />,
           },
         ],
       },

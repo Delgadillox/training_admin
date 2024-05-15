@@ -3,15 +3,27 @@ import PieChart from "./PieChart";
 import { transformDateHour } from "../utils";
 import PrintIcon from "@mui/icons-material/Print";
 import IconButton from "@mui/material/IconButton";
+import Modal from "@mui/material/Modal";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 
 const PdfDocument = ({ data }) => {
   const [showPrintButton, setShowPrintButton] = useState(true);
+  const [showColorModal, setShowColorModal] = useState(false);
+  const [colors, setColors] = useState([
+    "#008f39",
+    "#e6cc00",
+    "#ff0000",
+    "#4BC0C0",
+    "#9966FF",
+    "#FF9F40",
+  ]);
 
   useEffect(() => {
     if (!showPrintButton) {
       window.print();
       setTimeout(() => {
-        setShowPrintButton(true); // Restablecer el botón para que se muestre después de imprimir
+        setShowPrintButton(true);
       }, 500);
     }
   }, [showPrintButton]);
@@ -20,12 +32,31 @@ const PdfDocument = ({ data }) => {
     setShowPrintButton(false);
   };
 
+  const handleOpenColorModal = () => {
+    setShowColorModal(true);
+  };
+
+  const handleCloseColorModal = () => {
+    setShowColorModal(false);
+  };
+
+  const handleColorChange = (index, event) => {
+    const newColors = [...colors];
+    newColors[index] = event.target.value;
+    setColors(newColors);
+  };
+
   return (
     <>
       {showPrintButton && (
-        <IconButton style={styles.printButton} onClick={handlePrint}>
-          <PrintIcon />
-        </IconButton>
+        <>
+          <IconButton style={styles.printButton} onClick={handlePrint}>
+            <PrintIcon />
+          </IconButton>
+          <Button style={styles.colorButton} onClick={handleOpenColorModal}>
+            Cambiar colores del gráfico
+          </Button>
+        </>
       )}
       <div style={styles.document}>
         <h1 style={styles.title}>{data.name}</h1>
@@ -36,11 +67,42 @@ const PdfDocument = ({ data }) => {
           <div key={question.id} style={styles.section}>
             <h2 style={styles.title}>{question.question}</h2>
             <div style={styles.chartContainer}>
-              <PieChart key={question.id} responses={question.responses} />
+              <PieChart
+                key={question.id}
+                responses={question.responses}
+                colors={colors}
+              />
             </div>
           </div>
         ))}
+
+        {data.comments && (
+          <div style={styles.commentsSection}>
+            <h1 style={styles.commentsTitle}>Comentarios</h1>
+            <p style={styles.comment}>{data.comments}</p>
+          </div>
+        )}
       </div>
+
+      <Modal open={showColorModal} onClose={handleCloseColorModal}>
+        <div style={styles.modalContent}>
+          <h2>Selecciona los colores del gráfico</h2>
+          {colors.map((color, index) => (
+            <div key={index} style={styles.colorInput}>
+              <TextField
+                type="color"
+                label={`Color ${index + 1}`}
+                value={color}
+                onChange={(e) => handleColorChange(index, e)}
+                fullWidth
+              />
+            </div>
+          ))}
+          <Button onClick={handleCloseColorModal} style={styles.saveButton}>
+            Guardar
+          </Button>
+        </div>
+      </Modal>
     </>
   );
 };
@@ -48,6 +110,7 @@ const PdfDocument = ({ data }) => {
 const styles = {
   document: {
     flexDirection: "column",
+    padding: "20px",
   },
   section: {
     flexGrow: 1,
@@ -55,13 +118,13 @@ const styles = {
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: "20px", // Espacio entre secciones
-    pageBreakInside: "avoid", // Evita cortes dentro de la sección
+    marginBottom: "20px",
+    pageBreakInside: "avoid",
     width: "100%",
   },
   title: {
     textAlign: "center",
-    fontSize: "22px", // más grande para destacar
+    fontSize: "22px",
     fontFamily: "Roboto, sans-serif",
     fontWeight: "bold",
     color: "#333",
@@ -76,24 +139,72 @@ const styles = {
     textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
   },
   chartContainer: {
-    margin: "0 auto", // Centra el gráfico
+    margin: "0 auto",
     height: "302px",
   },
   printButton: {
-    position: "absolute", // Cambio de 'display' a 'position'
-    left: "10px", // Posición desde la izquierda
-    top: "10px", // Posición desde la parte superior
-    zIndex: 1000, // Asegura que esté sobre otros elementos
+    position: "absolute",
+    left: "10px",
+    top: "10px",
+    zIndex: 1000,
     "@media print": {
       display: "none",
     },
   },
+  colorButton: {
+    position: "absolute",
+    right: "10px",
+    top: "10px",
+    zIndex: 1000,
+    "@media print": {
+      display: "none",
+    },
+  },
+  commentsSection: {
+    marginTop: "20px",
+    padding: "10px",
+    borderTop: "1px solid #ddd",
+  },
+  commentsTitle: {
+    textAlign: "center",
+    fontSize: "20px",
+    fontFamily: "Roboto, sans-serif",
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: "10px",
+  },
+  comment: {
+    padding: "10px",
+    fontSize: "16px",
+    fontFamily: "Roboto, sans-serif",
+    color: "#555",
+  },
+  modalContent: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "400px",
+    backgroundColor: "white",
+    padding: "20px",
+    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+    borderRadius: "8px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+  },
+  colorInput: {
+    margin: "10px 0",
+    width: "100%",
+  },
+  saveButton: {
+    marginTop: "20px",
+  },
   "@media print": {
     section: {
-      pageBreakAfter: "always", // Inserta un salto de página después de cada sección
-      height: "50vh", // Asegura que cada sección use solo la mitad de la página verticalmente
+      pageBreakAfter: "always",
+      height: "50vh",
     },
-    // Esconde el tercer elemento y siguientes pares para evitar que aparezcan en la misma página
     "section:nth-of-type(2n+1)": {
       pageBreakAfter: "always",
     },
@@ -101,7 +212,10 @@ const styles = {
       pageBreakAfter: "auto",
     },
     printButton: {
-      display: "none", // Oculta el botón de impresión en el modo de impresión
+      display: "none",
+    },
+    colorButton: {
+      display: "none",
     },
   },
 };
