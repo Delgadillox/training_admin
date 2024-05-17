@@ -40,7 +40,7 @@ function Home() {
   return (
     <div style={styles.container}>
       <Typography variant="h3" component="h1" style={styles.title}>
-        Bienvenido a Training Admin
+        Plataforma de Administración de Encuestas
       </Typography>
       <Typography variant="h6" component="p" style={styles.description}>
         Esta es la plataforma para gestionar y administrar encuestas y reportes
