@@ -210,15 +210,16 @@ const Create = () => {
   };
 
   const validateResponses = () => {
-    let maxNumber = 0;
-    for (const response of formData.responses) {
-      const sum = response?.options.reduce((acc, curr) => acc + curr, 0);
-      if (maxNumber > 0 && sum !== maxNumber) {
-        return false;
-      }
-      maxNumber = Math.max(maxNumber, sum);
-    }
     return true;
+    // let maxNumber = 0;
+    // for (const response of formData.responses) {
+    //   const sum = response?.options.reduce((acc, curr) => acc + curr, 0);
+    //   if (maxNumber > 0 && sum !== maxNumber) {
+    //     return false;
+    //   }
+    //   maxNumber = Math.max(maxNumber, sum);
+    // }
+    // return true;
   };
 
   const clearState = () => {

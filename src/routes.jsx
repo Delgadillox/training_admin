@@ -4,6 +4,7 @@ import { New, List as ListQuizz } from "./pages/Encuestas/Index";
 import { Create, List } from "./pages/Reportes/Index";
 import { Companies } from "./pages/Admin/Index";
 import PDFView from "./pages/PDFView";
+import GroupPDF from "./pages/GroupPDF";
 import DynamicView from "./pages/Reportes/DynamicView";
 
 import {
@@ -90,5 +91,9 @@ export const router = [
   {
     path: "/reporteDinamico",
     element: <DynamicView />,
+  },
+  {
+    path: "/group-pdf",
+    element: <GroupPDF />,
   },
 ];

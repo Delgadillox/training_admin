@@ -1,17 +1,15 @@
-import { useState, useEffect } from "react";
-import PieChart from "./PieChart";
-import { transformDateHour } from "../utils";
+// src/pages/GroupPDF.jsx
+import React, { useState, useEffect } from "react";
+import { Button, IconButton } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import ColorModal from "./Reportes/Modals/ColorModal";
-import GroupModal from "./Reportes/Modals/GroupModal";
+import ColorModal from "../components/Reportes/Modals/ColorModal";
+import PieChart from "../components/PieChart";
 
-const PdfDocument = ({ data }) => {
+const GroupPDF = () => {
+  const [data, setData] = useState(null);
+  const [groups, setGroups] = useState([]);
   const [showPrintButton, setShowPrintButton] = useState(true);
   const [showColorModal, setShowColorModal] = useState(false);
-  const [showGroupModal, setShowGroupModal] = useState(false);
   const [colors, setColors] = useState([
     "#008f39",
     "#e6cc00",
@@ -20,7 +18,6 @@ const PdfDocument = ({ data }) => {
     "#9966FF",
     "#FF9F40",
   ]);
-  const [groups, setGroups] = useState([]);
 
   useEffect(() => {
     if (!showPrintButton) {
@@ -31,12 +28,17 @@ const PdfDocument = ({ data }) => {
     }
   }, [showPrintButton]);
 
+  useEffect(() => {
+    const storedData = localStorage.getItem("groupPdfData");
+    if (storedData) {
+      const { data, groups } = JSON.parse(storedData);
+      setData(data);
+      setGroups(groups);
+    }
+  }, []);
+
   const handlePrint = () => {
     setShowPrintButton(false);
-  };
-
-  const handleOpenColorModal = () => {
-    setShowColorModal(true);
   };
 
   const handleColorChange = (index, event) => {
@@ -45,15 +47,30 @@ const PdfDocument = ({ data }) => {
     setColors(newColors);
   };
 
-  const handleGroupCreation = (newGroups) => {
-    setGroups(newGroups);
-    console.log(newGroups);
-    localStorage.setItem(
-      "groupPdfData",
-      JSON.stringify({ data, groups: newGroups })
-    );
-    window.open("/admin/group-pdf", "_blank");
+  const combineResponses = (questions) => {
+    const combinedResponses = {};
+
+    questions.forEach((questionText) => {
+      const questionData = data.questions.find(
+        (q) => q.question === questionText
+      );
+      if (questionData) {
+        questionData.responses.forEach(({ option, count }) => {
+          const normalizedOption = option.replace(/\s+/g, "").toUpperCase();
+          if (!combinedResponses[normalizedOption]) {
+            combinedResponses[normalizedOption] = { option, count: 0 };
+          }
+          combinedResponses[normalizedOption].count += count;
+        });
+      }
+    });
+
+    return Object.values(combinedResponses);
   };
+
+  if (!data) {
+    return <div>Cargando...</div>;
+  }
 
   return (
     <>
@@ -62,34 +79,28 @@ const PdfDocument = ({ data }) => {
           <IconButton style={styles.printButton} onClick={handlePrint}>
             <PrintIcon />
           </IconButton>
-          <Button style={styles.colorButton} onClick={handleOpenColorModal}>
-            Cambiar colores del gráfico
-          </Button>
           <Button
-            style={styles.groupButton}
-            onClick={() => setShowGroupModal(true)}
+            style={styles.colorButton}
+            onClick={() => setShowColorModal(true)}
           >
-            Crear Grupos
+            Cambiar colores del gráfico
           </Button>
         </>
       )}
       <div style={styles.document}>
-        <h1 style={styles.title}>{data.name}</h1>
-        {data.company && <h2 style={styles.subtitle}>{data.company}</h2>}
-        {data.leader && <h2 style={styles.subtitle}>{data.leader}</h2>}
-
-        {data.questions.map((question) => (
-          <div key={question.id} style={styles.section}>
-            <h2 style={styles.title}>{question.question}</h2>
-            <div style={styles.chartContainer}>
-              <PieChart
-                key={question.id}
-                responses={question.responses}
-                colors={colors}
-              />
+        {groups.map((group, groupIndex) => {
+          const combinedResponses = combineResponses(group.questions);
+          return (
+            <div key={groupIndex}>
+              <h1 style={styles.title}>{group.name}</h1>
+              <div style={styles.section}>
+                <div style={styles.chartContainer}>
+                  <PieChart responses={combinedResponses} colors={colors} />
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {data.comments && (
           <div style={styles.commentsSection}>
@@ -98,18 +109,12 @@ const PdfDocument = ({ data }) => {
           </div>
         )}
       </div>
+
       <ColorModal
         open={showColorModal}
         handleClose={() => setShowColorModal(false)}
         colors={colors}
         handleColorChange={handleColorChange}
-      />
-
-      <GroupModal
-        open={showGroupModal}
-        handleClose={() => setShowGroupModal(false)}
-        questions={data.questions.map((q) => q.question)}
-        handleGroupCreation={handleGroupCreation}
       />
     </>
   );
@@ -138,14 +143,6 @@ const styles = {
     color: "#333",
     paddingBottom: "5px",
   },
-  subtitle: {
-    textAlign: "center",
-    fontSize: "18px",
-    fontFamily: "Roboto, sans-serif",
-    fontWeight: "normal",
-    color: "#555",
-    textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
-  },
   chartContainer: {
     margin: "0 auto",
     height: "302px",
@@ -163,15 +160,6 @@ const styles = {
     position: "absolute",
     right: "10px",
     top: "10px",
-    zIndex: 1000,
-    "@media print": {
-      display: "none",
-    },
-  },
-  groupButton: {
-    position: "absolute",
-    right: "10px",
-    top: "50px",
     zIndex: 1000,
     "@media print": {
       display: "none",
@@ -213,10 +201,7 @@ const styles = {
     colorButton: {
       display: "none",
     },
-    groupButton: {
-      display: "none",
-    },
   },
 };
 
-export default PdfDocument;
+export default GroupPDF;
