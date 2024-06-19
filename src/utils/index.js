@@ -13,3 +13,16 @@ export const transformDateHour = (date) => {
 
   return result;
 };
+
+export const transformDate = (date) => {
+  const fecha = new Date(date);
+
+  const padNumber = (num) => num.toString().padStart(2, "0");
+  const fechaFormateada = `${padNumber(fecha.getDate())}/${padNumber(
+    fecha.getMonth() + 1
+  )}/${fecha.getFullYear()}`;
+
+  const result = `${fechaFormateada}`;
+
+  return result;
+};
