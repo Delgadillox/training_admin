@@ -1,9 +1,9 @@
-// src/pages/GroupPDF.jsx
 import React, { useState, useEffect } from "react";
 import { Button, IconButton } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
 import ColorModal from "../components/Reportes/Modals/ColorModal";
 import PieChart from "../components/PieChart";
+import BarChart3D from "../components/Reportes/BarChart3D";
 
 const GroupPDF = () => {
   const [data, setData] = useState(null);
@@ -18,6 +18,7 @@ const GroupPDF = () => {
     "#9966FF",
     "#FF9F40",
   ]);
+  const [chartType, setChartType] = useState("pie");
 
   useEffect(() => {
     if (!showPrintButton) {
@@ -49,7 +50,6 @@ const GroupPDF = () => {
 
   const combineResponses = (questions) => {
     const combinedResponses = {};
-
     questions.forEach((questionText) => {
       const questionData = data.questions.find(
         (q) => q.question === questionText
@@ -85,17 +85,30 @@ const GroupPDF = () => {
           >
             Cambiar colores del gráfico
           </Button>
+          {/* <Button
+            style={styles.chartTypeButton}
+            onClick={() => setChartType(chartType === "pie" ? "bar" : "pie")}
+          >
+            {chartType === "pie"
+              ? "Ver Gráfico de Barras"
+              : "Ver Gráfico de Pastel"}
+          </Button> */}
         </>
       )}
       <div style={styles.document}>
         {groups.map((group, groupIndex) => {
+          console.log(group);
           const combinedResponses = combineResponses(group.questions);
           return (
             <div key={groupIndex}>
               <h1 style={styles.title}>{group.name}</h1>
               <div style={styles.section}>
                 <div style={styles.chartContainer}>
-                  <PieChart responses={combinedResponses} colors={colors} />
+                  {chartType === "pie" ? (
+                    <PieChart responses={combinedResponses} colors={colors} />
+                  ) : (
+                    <BarChart3D responses={combinedResponses} colors={colors} />
+                  )}
                 </div>
               </div>
             </div>
@@ -165,6 +178,15 @@ const styles = {
       display: "none",
     },
   },
+  chartTypeButton: {
+    position: "absolute",
+    right: "10px",
+    top: "50px",
+    zIndex: 1000,
+    "@media print": {
+      display: "none",
+    },
+  },
   commentsSection: {
     marginTop: "20px",
     padding: "10px",
@@ -199,6 +221,9 @@ const styles = {
       display: "none",
     },
     colorButton: {
+      display: "none",
+    },
+    chartTypeButton: {
       display: "none",
     },
   },

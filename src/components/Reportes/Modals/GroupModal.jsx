@@ -19,9 +19,15 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const GroupModal = ({ open, handleClose, questions, handleGroupCreation }) => {
+const GroupModal = ({
+  groups,
+  setGroups,
+  open,
+  handleClose,
+  questions,
+  handleGroupCreation,
+}) => {
   const [groupName, setGroupName] = useState("");
-  const [groups, setGroups] = useState([]);
   const [selectedQuestions, setSelectedQuestions] = useState([]);
   const [expandedGroups, setExpandedGroups] = useState([]);
 
@@ -51,8 +57,8 @@ const GroupModal = ({ open, handleClose, questions, handleGroupCreation }) => {
     setGroups((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleCreateGroups = () => {
-    handleGroupCreation(groups);
+  const handleCreateGroups = (option) => {
+    handleGroupCreation(option, groups);
     handleClose();
   };
 
@@ -130,14 +136,24 @@ const GroupModal = ({ open, handleClose, questions, handleGroupCreation }) => {
             </Box>
           ))}
         </List>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleCreateGroups}
-          style={styles.saveButton}
-        >
-          Crear Grupos
-        </Button>
+        <Box sx={styles.buttonContainer}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => handleCreateGroups(1)}
+            style={styles.button}
+          >
+            Ver Detalle
+          </Button>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => handleCreateGroups(2)}
+            style={styles.button}
+          >
+            Ver Resumen
+          </Button>
+        </Box>
       </Box>
     </Modal>
   );
@@ -189,6 +205,15 @@ const styles = {
   },
   nested: {
     paddingLeft: "30px",
+  },
+  buttonContainer: {
+    display: "flex",
+    width: "100%",
+    marginTop: "10px",
+  },
+  button: {
+    flex: 1,
+    margin: "0 5px",
   },
 };
 

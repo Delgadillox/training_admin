@@ -6,6 +6,7 @@ import PollIcon from "@mui/icons-material/Poll";
 import BusinessIcon from "@mui/icons-material/Business";
 import PeopleIcon from "@mui/icons-material/People";
 import ReportIcon from "@mui/icons-material/Assessment";
+import Logo from "../assets/logo.jpg";
 
 function Home() {
   const navigate = useNavigate();
@@ -39,13 +40,14 @@ function Home() {
 
   return (
     <div style={styles.container}>
-      <Typography variant="h3" component="h1" style={styles.title}>
+      <img src={Logo} alt="Logo" height="100%" width="100%" />
+      {/* <Typography variant="h3" component="h1" style={styles.title}>
         Plataforma de Administración de Encuestas
-      </Typography>
-      <Typography variant="h6" component="p" style={styles.description}>
+      </Typography> */}
+      {/* <Typography variant="h6" component="p" style={styles.description}>
         Esta es la plataforma para gestionar y administrar encuestas y reportes
         de entrenamiento.
-      </Typography>
+      </Typography> */}
 
       <Grid container spacing={3} style={styles.grid}>
         <Grid item xs={12} sm={6} md={4}>

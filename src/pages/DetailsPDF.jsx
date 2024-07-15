@@ -1,18 +1,15 @@
-import { useState, useEffect } from "react";
-import PieChart from "./PieChart";
-import { transformDateHour } from "../utils";
+import React, { useState, useEffect } from "react";
+import { Button, IconButton } from "@mui/material";
 import PrintIcon from "@mui/icons-material/Print";
-import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import ColorModal from "./Reportes/Modals/ColorModal";
-import GroupModal from "./Reportes/Modals/GroupModal";
-import axios from "axios";
+import ColorModal from "../components/Reportes/Modals/ColorModal";
+import PieChart from "../components/PieChart";
+import BarChart3D from "../components/Reportes/BarChart3D";
 
-const PdfDocument = ({ data }) => {
+const DetailsPDF = () => {
+  const [data, setData] = useState(null);
+  const [groups, setGroups] = useState([]);
   const [showPrintButton, setShowPrintButton] = useState(true);
   const [showColorModal, setShowColorModal] = useState(false);
-  const [showGroupModal, setShowGroupModal] = useState(false);
   const [colors, setColors] = useState([
     "#008f39",
     "#e6cc00",
@@ -21,26 +18,7 @@ const PdfDocument = ({ data }) => {
     "#9966FF",
     "#FF9F40",
   ]);
-  const [savedGroups, setSavedGroups] = useState([]);
-  const [groups, setGroups] = useState([]);
-
-  useEffect(() => {
-    const url = `https://psicologia-aplicada.com/quizz/psicologia-api/reports/getGroups.php?id=${data.id}`;
-    fetch(url)
-      .then((response) => response.json())
-      .then((groups) => {
-        console.log(groups);
-        let s = [];
-        if (groups.length > 0) {
-          s = JSON.parse(groups[0].grupo);
-        }
-        console.log(s);
-        setSavedGroups(s);
-      })
-      .catch((error) => {
-        console.error("Error fetching groups:", error);
-      });
-  }, []);
+  const [chartType, setChartType] = useState("pie"); // Nueva variable de estado para el tipo de gráfico
 
   useEffect(() => {
     if (!showPrintButton) {
@@ -51,12 +29,17 @@ const PdfDocument = ({ data }) => {
     }
   }, [showPrintButton]);
 
+  useEffect(() => {
+    const storedData = localStorage.getItem("groupPdfData");
+    if (storedData) {
+      const { data, groups } = JSON.parse(storedData);
+      setData(data);
+      setGroups(groups);
+    }
+  }, []);
+
   const handlePrint = () => {
     setShowPrintButton(false);
-  };
-
-  const handleOpenColorModal = () => {
-    setShowColorModal(true);
   };
 
   const handleColorChange = (index, event) => {
@@ -65,33 +48,9 @@ const PdfDocument = ({ data }) => {
     setColors(newColors);
   };
 
-  const handleGroupCreation = (option, newGroups) => {
-    setGroups(newGroups);
-
-    const payload = {
-      idEncuesta: data.id,
-      groups: newGroups,
-    };
-
-    try {
-      const response = axios.post(
-        "https://psicologia-aplicada.com/quizz/psicologia-api/reports/insertupdateGroup.php",
-        payload
-      );
-    } catch (e) {
-      console.error(e.toString());
-    }
-
-    localStorage.setItem(
-      "groupPdfData",
-      JSON.stringify({ data, groups: newGroups })
-    );
-    if (option === 1) {
-      window.open("/admin/details-pdf", "_blank");
-    } else {
-      window.open("/admin/group-pdf", "_blank");
-    }
-  };
+  if (!data) {
+    return <div>Cargando...</div>;
+  }
 
   return (
     <>
@@ -100,35 +59,54 @@ const PdfDocument = ({ data }) => {
           <IconButton style={styles.printButton} onClick={handlePrint}>
             <PrintIcon />
           </IconButton>
-          <Button style={styles.colorButton} onClick={handleOpenColorModal}>
+          <Button
+            style={styles.colorButton}
+            onClick={() => setShowColorModal(true)}
+          >
             Cambiar colores del gráfico
           </Button>
-          <Button
-            style={styles.groupButton}
-            onClick={() => setShowGroupModal(true)}
+          {/* <Button
+            style={styles.chartTypeButton}
+            onClick={() => setChartType(chartType === "pie" ? "bar" : "pie")}
           >
-            Crear Grupos
-          </Button>
+            {chartType === "pie"
+              ? "Ver Gráfico de Barras"
+              : "Ver Gráfico de Pastel"}
+          </Button> */}
         </>
       )}
       <div style={styles.document}>
-        <h1 style={styles.title}>{data.name}</h1>
-        {data.company && <h2 style={styles.subtitle}>{data.company}</h2>}
-        {data.leader && <h2 style={styles.subtitle}>{data.leader}</h2>}
-
-        {data.questions.map((question) => (
-          <div key={question.id} style={styles.section}>
-            <h2 style={styles.title}>{question.question}</h2>
-            <div style={styles.chartContainer}>
-              <PieChart
-                key={question.id}
-                responses={question.responses}
-                colors={colors}
-              />
-            </div>
-          </div>
+        {groups.map((group, groupIndex) => (
+          <React.Fragment key={groupIndex}>
+            <h1 style={styles.title}>{group.name}</h1>
+            {group.questions.map((q, questionIndex) => {
+              const questionData = data.questions.find(
+                (gq) => gq.question === q
+              );
+              if (!questionData) return null;
+              return (
+                <div key={questionData.id}>
+                  <h2 style={styles.subtitle}>{questionData.question}</h2>
+                  <div style={styles.section}>
+                    <div style={styles.chartContainer}>
+                      {chartType === "pie" ? (
+                        <PieChart
+                          responses={questionData.responses}
+                          colors={colors}
+                        />
+                      ) : (
+                        <BarChart3D
+                          responses={questionData.responses}
+                          colors={colors}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </React.Fragment>
         ))}
-
         {data.comments && (
           <div style={styles.commentsSection}>
             <h1 style={styles.commentsTitle}>Comentarios</h1>
@@ -141,15 +119,6 @@ const PdfDocument = ({ data }) => {
         handleClose={() => setShowColorModal(false)}
         colors={colors}
         handleColorChange={handleColorChange}
-      />
-
-      <GroupModal
-        groups={savedGroups}
-        setGroups={setSavedGroups}
-        open={showGroupModal}
-        handleClose={() => setShowGroupModal(false)}
-        questions={data.questions.map((q) => q.question)}
-        handleGroupCreation={handleGroupCreation}
       />
     </>
   );
@@ -180,11 +149,11 @@ const styles = {
   },
   subtitle: {
     textAlign: "center",
-    fontSize: "18px",
+    fontSize: "15px",
     fontFamily: "Roboto, sans-serif",
-    fontWeight: "normal",
-    color: "#555",
-    textShadow: "1px 1px 2px rgba(0,0,0,0.1)",
+    fontWeight: "bold",
+    color: "#333",
+    paddingBottom: "5px",
   },
   chartContainer: {
     margin: "0 auto",
@@ -208,7 +177,7 @@ const styles = {
       display: "none",
     },
   },
-  groupButton: {
+  chartTypeButton: {
     position: "absolute",
     right: "10px",
     top: "50px",
@@ -253,10 +222,10 @@ const styles = {
     colorButton: {
       display: "none",
     },
-    groupButton: {
+    chartTypeButton: {
       display: "none",
     },
   },
 };
 
-export default PdfDocument;
+export default DetailsPDF;

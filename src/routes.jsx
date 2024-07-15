@@ -5,6 +5,7 @@ import { Create, List } from "./pages/Reportes/Index";
 import { Companies } from "./pages/Admin/Index";
 import PDFView from "./pages/PDFView";
 import GroupPDF from "./pages/GroupPDF";
+import DetailsPDF from "./pages/DetailsPDF";
 import DynamicView from "./pages/Reportes/DynamicView";
 
 import {
@@ -95,5 +96,9 @@ export const router = [
   {
     path: "/group-pdf",
     element: <GroupPDF />,
+  },
+  {
+    path: "/details-pdf",
+    element: <DetailsPDF />,
   },
 ];

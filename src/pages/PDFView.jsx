@@ -103,7 +103,7 @@ const PDFView = () => {
       if (!filters.id) comments = "";
 
       const finalReport = {
-        id: 1,
+        id: filters.selectedTitle,
         name: reports[0].titulo,
         date: date,
         company: company,
