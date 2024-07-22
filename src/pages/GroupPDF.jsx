@@ -4,6 +4,7 @@ import PrintIcon from "@mui/icons-material/Print";
 import ColorModal from "../components/Reportes/Modals/ColorModal";
 import PieChart from "../components/PieChart";
 import BarChart3D from "../components/Reportes/BarChart3D";
+import logo from "../assets/logo.jpg";
 
 const GroupPDF = () => {
   const [data, setData] = useState(null);
@@ -122,7 +123,9 @@ const GroupPDF = () => {
           </div>
         )}
       </div>
-
+      <div style={styles.footer}>
+        <img src={logo} alt="Footer" style={styles.footerImage} />
+      </div>
       <ColorModal
         open={showColorModal}
         handleClose={() => setShowColorModal(false)}
@@ -206,6 +209,18 @@ const styles = {
     fontFamily: "Roboto, sans-serif",
     color: "#555",
   },
+  footer: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    textAlign: "right",
+    zIndex: -1,
+  },
+  footerImage: {
+    width: "250px",
+    height: "auto",
+  },
   "@media print": {
     section: {
       pageBreakAfter: "always",
@@ -225,6 +240,14 @@ const styles = {
     },
     chartTypeButton: {
       display: "none",
+    },
+    footer: {
+      position: "fixed",
+      bottom: 0,
+      left: 0,
+      width: "100%",
+      textAlign: "center",
+      zIndex: -1,
     },
   },
 };

@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import PieChart from "./PieChart";
-import { transformDateHour } from "../utils";
 import PrintIcon from "@mui/icons-material/Print";
 import IconButton from "@mui/material/IconButton";
 import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
 import ColorModal from "./Reportes/Modals/ColorModal";
 import GroupModal from "./Reportes/Modals/GroupModal";
 import axios from "axios";
+import logo from "../assets/logo.jpg";
 
 const PdfDocument = ({ data }) => {
   const [showPrintButton, setShowPrintButton] = useState(true);
@@ -29,12 +28,10 @@ const PdfDocument = ({ data }) => {
     fetch(url)
       .then((response) => response.json())
       .then((groups) => {
-        console.log(groups);
         let s = [];
         if (groups.length > 0) {
           s = JSON.parse(groups[0].grupo);
         }
-        console.log(s);
         setSavedGroups(s);
       })
       .catch((error) => {
@@ -136,6 +133,9 @@ const PdfDocument = ({ data }) => {
           </div>
         )}
       </div>
+      <div style={styles.footer}>
+        <img src={logo} alt="Footer" style={styles.footerImage} />
+      </div>
       <ColorModal
         open={showColorModal}
         handleClose={() => setShowColorModal(false)}
@@ -236,6 +236,18 @@ const styles = {
     fontFamily: "Roboto, sans-serif",
     color: "#555",
   },
+  footer: {
+    position: "fixed",
+    bottom: 0,
+    left: 0,
+    width: "100%",
+    textAlign: "right",
+    zIndex: -1,
+  },
+  footerImage: {
+    width: "250px",
+    height: "auto",
+  },
   "@media print": {
     section: {
       pageBreakAfter: "always",
@@ -255,6 +267,14 @@ const styles = {
     },
     groupButton: {
       display: "none",
+    },
+    footer: {
+      position: "fixed",
+      bottom: 0,
+      left: 0,
+      width: "100%",
+      textAlign: "center",
+      zIndex: -1,
     },
   },
 };
