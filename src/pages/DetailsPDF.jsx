@@ -76,6 +76,9 @@ const DetailsPDF = () => {
           </Button> */}
         </>
       )}
+      <div style={styles.header}>
+        <img src={logo} alt="Header Logo" style={styles.headerImage} />
+      </div>
       <div style={styles.document}>
         {groups.map((group, groupIndex) => (
           <React.Fragment key={groupIndex}>
@@ -88,7 +91,15 @@ const DetailsPDF = () => {
               return (
                 <div key={questionData.id}>
                   <h2 style={styles.subtitle}>{questionData.question}</h2>
-                  <div style={styles.section}>
+                  <div
+                    style={{
+                      ...styles.section,
+                      paddingTop:
+                        questionIndex !== 0 && questionIndex % 2 === 1
+                          ? "70px"
+                          : "0px", // Aplica paddingTop a los índices 1, 3, 5, 7, etc.
+                    }}
+                  >
                     <div style={styles.chartContainer}>
                       {chartType === "pie" ? (
                         <PieChart
@@ -114,9 +125,6 @@ const DetailsPDF = () => {
             <p style={styles.comment}>{data.comments}</p>
           </div>
         )}
-      </div>
-      <div style={styles.footer}>
-        <img src={logo} alt="Footer" style={styles.footerImage} />
       </div>
       <ColorModal
         open={showColorModal}
@@ -209,46 +217,17 @@ const styles = {
     fontFamily: "Roboto, sans-serif",
     color: "#555",
   },
-  footer: {
+  header: {
     position: "fixed",
-    bottom: 0,
+    top: 0,
     left: 0,
     width: "100%",
-    textAlign: "right",
-    zIndex: -1,
+    textAlign: "center",
+    zIndex: 1,
   },
-  footerImage: {
+  headerImage: {
     width: "250px",
     height: "auto",
-  },
-  "@media print": {
-    section: {
-      pageBreakAfter: "always",
-      height: "50vh",
-    },
-    "section:nth-of-type(2n+1)": {
-      pageBreakAfter: "always",
-    },
-    "section:nth-of-type(2n)": {
-      pageBreakAfter: "auto",
-    },
-    printButton: {
-      display: "none",
-    },
-    colorButton: {
-      display: "none",
-    },
-    chartTypeButton: {
-      display: "none",
-    },
-    footer: {
-      position: "fixed",
-      bottom: 0,
-      left: 0,
-      width: "100%",
-      textAlign: "center",
-      zIndex: -1,
-    },
   },
 };
 

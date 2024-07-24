@@ -96,6 +96,9 @@ const GroupPDF = () => {
           </Button> */}
         </>
       )}
+      <div style={styles.header}>
+        <img src={logo} alt="Header Logo" style={styles.headerImage} />
+      </div>
       <div style={styles.document}>
         {groups.map((group, groupIndex) => {
           console.log(group);
@@ -103,7 +106,13 @@ const GroupPDF = () => {
           return (
             <div key={groupIndex}>
               <h1 style={styles.title}>{group.name}</h1>
-              <div style={styles.section}>
+              <div
+                style={{
+                  ...styles.section,
+                  paddingTop:
+                    groupIndex !== 0 && groupIndex % 2 === 1 ? "70px" : "0px", // Aplica paddingTop a los índices 1, 3, 5, 7, etc.
+                }}
+              >
                 <div style={styles.chartContainer}>
                   {chartType === "pie" ? (
                     <PieChart responses={combinedResponses} colors={colors} />
@@ -122,9 +131,6 @@ const GroupPDF = () => {
             <p style={styles.comment}>{data.comments}</p>
           </div>
         )}
-      </div>
-      <div style={styles.footer}>
-        <img src={logo} alt="Footer" style={styles.footerImage} />
       </div>
       <ColorModal
         open={showColorModal}
@@ -241,13 +247,17 @@ const styles = {
     chartTypeButton: {
       display: "none",
     },
-    footer: {
+    header: {
       position: "fixed",
-      bottom: 0,
+      top: 0,
       left: 0,
       width: "100%",
       textAlign: "center",
-      zIndex: -1,
+      zIndex: 1,
+    },
+    headerImage: {
+      width: "250px",
+      height: "auto",
     },
   },
 };

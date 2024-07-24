@@ -108,13 +108,22 @@ const PdfDocument = ({ data }) => {
           </Button>
         </>
       )}
+      <div style={styles.header}>
+        <img src={logo} alt="Header Logo" style={styles.headerImage} />
+      </div>
       <div style={styles.document}>
         <h1 style={styles.title}>{data.name}</h1>
         {data.company && <h2 style={styles.subtitle}>{data.company}</h2>}
         {data.leader && <h2 style={styles.subtitle}>{data.leader}</h2>}
 
-        {data.questions.map((question) => (
-          <div key={question.id} style={styles.section}>
+        {data.questions.map((question, index) => (
+          <div
+            key={question.id}
+            style={{
+              ...styles.section,
+              paddingTop: index !== 0 && index % 2 === 1 ? "70px" : "0px", // Aplica paddingTop a los índices 1, 3, 5, 7, etc.
+            }}
+          >
             <h2 style={styles.title}>{question.question}</h2>
             <div style={styles.chartContainer}>
               <PieChart
@@ -132,9 +141,6 @@ const PdfDocument = ({ data }) => {
             <p style={styles.comment}>{data.comments}</p>
           </div>
         )}
-      </div>
-      <div style={styles.footer}>
-        <img src={logo} alt="Footer" style={styles.footerImage} />
       </div>
       <ColorModal
         open={showColorModal}
@@ -236,46 +242,17 @@ const styles = {
     fontFamily: "Roboto, sans-serif",
     color: "#555",
   },
-  footer: {
+  header: {
     position: "fixed",
-    bottom: 0,
+    top: 0,
     left: 0,
     width: "100%",
-    textAlign: "right",
-    zIndex: -1,
+    textAlign: "center",
+    zIndex: 1,
   },
-  footerImage: {
+  headerImage: {
     width: "250px",
     height: "auto",
-  },
-  "@media print": {
-    section: {
-      pageBreakAfter: "always",
-      height: "50vh",
-    },
-    "section:nth-of-type(2n+1)": {
-      pageBreakAfter: "always",
-    },
-    "section:nth-of-type(2n)": {
-      pageBreakAfter: "auto",
-    },
-    printButton: {
-      display: "none",
-    },
-    colorButton: {
-      display: "none",
-    },
-    groupButton: {
-      display: "none",
-    },
-    footer: {
-      position: "fixed",
-      bottom: 0,
-      left: 0,
-      width: "100%",
-      textAlign: "center",
-      zIndex: -1,
-    },
   },
 };
 
