@@ -215,50 +215,17 @@ const styles = {
     fontFamily: "Roboto, sans-serif",
     color: "#555",
   },
-  footer: {
+  header: {
     position: "fixed",
-    bottom: 0,
+    top: 0,
     left: 0,
     width: "100%",
-    textAlign: "right",
-    zIndex: -1,
+    textAlign: "center",
+    zIndex: 1,
   },
-  footerImage: {
+  headerImage: {
     width: "250px",
     height: "auto",
-  },
-  "@media print": {
-    section: {
-      pageBreakAfter: "always",
-      height: "50vh",
-    },
-    "section:nth-of-type(2n+1)": {
-      pageBreakAfter: "always",
-    },
-    "section:nth-of-type(2n)": {
-      pageBreakAfter: "auto",
-    },
-    printButton: {
-      display: "none",
-    },
-    colorButton: {
-      display: "none",
-    },
-    chartTypeButton: {
-      display: "none",
-    },
-    header: {
-      position: "fixed",
-      top: 0,
-      left: 0,
-      width: "100%",
-      textAlign: "center",
-      zIndex: 1,
-    },
-    headerImage: {
-      width: "250px",
-      height: "auto",
-    },
   },
 };
 
