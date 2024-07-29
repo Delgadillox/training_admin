@@ -23,6 +23,10 @@ const PdfDocument = ({ data }) => {
   const [savedGroups, setSavedGroups] = useState([]);
   const [groups, setGroups] = useState([]);
 
+  const headerStyle = showPrintButton
+    ? styles.header
+    : { ...styles.header, ...styles.fixed };
+
   useEffect(() => {
     const url = `https://psicologia-aplicada.com/quizz/psicologia-api/reports/getGroups.php?id=${data.id}`;
     fetch(url)
@@ -108,14 +112,17 @@ const PdfDocument = ({ data }) => {
           </Button>
         </>
       )}
-      <div style={styles.header}>
+
+      <div style={headerStyle}>
         <img src={logo} alt="Header Logo" style={styles.headerImage} />
       </div>
-      <div style={styles.document}>
-        <h1 style={styles.title}>{data.name}</h1>
-        {data.company && <h2 style={styles.subtitle}>{data.company}</h2>}
-        {data.leader && <h2 style={styles.subtitle}>{data.leader}</h2>}
 
+      <div style={styles.document}>
+        <div stles={styles.headerContainer}>
+          <h1 style={styles.title}>{data.name}</h1>
+          {data.company && <h2 style={styles.subtitle}>{data.company}</h2>}
+          {data.leader && <h2 style={styles.subtitle}>{data.leader}</h2>}
+        </div>
         {data.questions.map((question, index) => (
           <div
             key={question.id}
@@ -162,9 +169,13 @@ const PdfDocument = ({ data }) => {
 };
 
 const styles = {
+  headerContainer: {
+    marginTop: "150px",
+  },
   document: {
     flexDirection: "column",
     padding: "20px",
+    marginTop: "70px",
   },
   section: {
     flexGrow: 1,
@@ -243,12 +254,14 @@ const styles = {
     color: "#555",
   },
   header: {
-    position: "fixed",
     top: 0,
     left: 0,
     width: "100%",
     textAlign: "center",
-    zIndex: 1,
+    zIndex: -10,
+  },
+  fixed: {
+    position: "fixed",
   },
   headerImage: {
     width: "250px",
